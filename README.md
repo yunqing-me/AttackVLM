@@ -52,7 +52,7 @@ In other words, we mislead and let the VLMs say what you want, regardless of the
 - lmdb, tqdm
 - wandb, torchvision, etc.
 
-As we apply [Stable Diffusion](https://github.com/CompVis/stable-diffusion) for targeted image generation, we init our [conda](https://docs.conda.io/en/latest/) environment following [Latent Diffusion Models](https://github.com/CompVis/latent-diffusion). Alternatively, a suitable conda environment named `ldm` can be created and activated with:
+As we apply [Stable Diffusion](https://github.com/CompVis/stable-diffusion) for targeted image generation, we init our [conda](https://docs.conda.io/en/latest/) environment following [Latent Diffusion Models](https://github.com/CompVis/latent-diffusion). In other words, a suitable base conda environment named `ldm` can be created and activated with:
 ```
 conda env create -f environment.yaml
 conda activate ldm
@@ -73,7 +73,7 @@ We use [Stable Diffusion](https://github.com/CompVis/stable-diffusion), [DALL-E]
 git clone https://github.com/CompVis/stable-diffusion.git
 cd stable-diffusion
 ```
-then, prepare the full targeted captions from [MS-COCO](https://cocodataset.org/#home), or download our processed and cleaned version from here:
+then, prepare the full targeted captions from [MS-COCO](https://cocodataset.org/#home), or download our processed and cleaned version:
 ```
 https://drive.google.com/file/d/19tT036LBvqYonzI7PfU9qVi3jVGApKrg/view?usp=sharing
 ```
@@ -96,13 +96,66 @@ python ./scripts/txt2img.py --ddim_eta 0.0 \
         --skip_grid \
         --ckpt ./_model_pool/sd-v1-4-full-ema.ckpt \
         --from-file './name_of_your_coco_captions_file.txt' \
-        --num_caption 10000 \ # to be adjusted
         --outdir ./path_of_your_targeted_images \
 ```
 Additional details of text-to-image generation by Stable Diffusion can be found [HERE](https://github.com/CompVis/stable-diffusion#:~:text=active%20community%20development.-,Reference%20Sampling%20Script,-We%20provide%20a).
 
 # Adversarial Attack & Black-box Query
+
+## Overview of our AttackVLM strategy
 ![Teaser image](./assets/teaser_4.jpg)
+
+## Prepare the VLM scripts
+
+There are two steps of adversarial attack for VLMs: (1) transfer-based attacking strategy and (2) query-based attacking strategy. Here, we use [Unidiffuser](https://github.com/thu-ml/unidiffuser) for an example, and other types of VLMs will be supported soon.
+
+### <b> Unidiffuser </b>
+
+```
+git clone https://github.com/thu-ml/unidiffuser.git
+```
+then, create a suitable conda environment following the steps [HERE](https://github.com/thu-ml/unidiffuser#:~:text=to%2Dimage%20generation\).-,Dependency,-conda%20create%20%2Dn), and prepare the corresponding model weights (we use `uvit_v1.pth` as the weight of U-ViT).
+
+- Transfer-based attacking strategy
+
+```
+CUDA_VISIBLE_DEVICES=0 \
+python _train_adv_img.py \
+--output unidiff_adv_transfer \
+--batch_size 250 \
+--num_samples 10000 \
+--steps 100 \
+--output 'name_of_your_output_img_folder' \
+```
+then perform image-to-text and store the response of $\boldsymbol{x}_\text{trans}$, this can be achieved by:
+
+```
+CUDA_VISIBLE_DEVICES=0 \
+python _eval_adv_img_i2t.py \
+--batch_size 10 \
+--mode i2t \
+--img_path './_output_img/name_of_your_output_img_folder' \
+--output_path 'name_of_your_output_txt_file' \
+```
+
+- Query-based attacking strategy (via RGF-estimator)
+
+```
+CUDA_VISIBLE_DEVICES=0 \
+python _train_adv_img_query.py \
+--output unidiff_adv_query \
+--text_path '../_output_text/name_of_your_output_txt_file.txt' \
+--batch_size 1 \
+--num_samples 10000 \
+--steps 8 \
+--sigma 8 \
+--delta 'zero' \
+--num_query 50 \
+--num_sub_query 25 \
+--wandb \
+--wandb_project_name tmp \
+--wandb_run_name tmp \
+```
 
 # Evaluation
 We use different types of CLIP text encoder (e.g., RN50, ViT-B/32, ViT-L/14, etc.) to evaluate the similarity between (a) the generated response and (b) the predefined targeted text $\boldsymbol{c}_\text{tar}$. Refer to the following eval script as an example:
@@ -116,7 +169,7 @@ python eval_clip_text_score.py \
 --tgt_text_path ./_output_text/your_tgt_captions.txt \
 ```
 
-Alternatively, you can use [`wandb`](https://wandb.ai/site) to dynamically monitor the moving average of the CLIP score.
+Alternatively, you can use [`wandb`](https://wandb.ai/site) to dynamically monitor the moving average of the CLIP score, this is because the query-based attack might be slow when processing abundant perturbed samples at the same time. 
 
 # Bibtex
 If you find this project useful in your research, please consider citing our paper:
