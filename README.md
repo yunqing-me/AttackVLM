@@ -38,6 +38,8 @@
 In this research, we evaluate the adversarial robustness of recent large vision-language models (VLMs), under the most realistic and challenging setting with threat model of black-box access and targeted goal.
 
 Our proposed method aims for the targeted response generation over large VLMs such as MiniGPT-4, LLaVA, Unidiffuser, BLIP/2, Img2Prompt, etc.
+
+In other words, we mislead and let the VLMs say what you want, regardless of the content of the input images.
 ```
 
 ![Teaser image](./assets/teaser_1.jpg)
@@ -61,9 +63,13 @@ Note that for different victim models, we will follow their official implementat
 
 # Targeted Image Generation
 ![Teaser image](./assets/teaser_3.jpg)
-As discussed in our paper, to achieve a flexible targeted attack, we leverage a pretrained text-to-image model to generate an image given a single caption as the targeted text, consequently you can specify the goal of attack by yourself! We use Stable Diffusion or Midjourney in our experiments, but we use Stable Diffusion in this demonstration. 
+As discussed in our paper, to achieve a flexible targeted attack, we leverage a pretrained text-to-image model to generate an targetd image given a single caption as the targeted text. Consequently, in this way you can specify the targeted caption for attack by yourself! 
+
+We use [Stable Diffusion](https://github.com/CompVis/stable-diffusion), [DALL-E](https://openai.com/blog/dall-e-now-available-without-waitlist) or [Midjourney](https://www.midjourney.com/app/) as the text-to-image generators in our experiments. Here, we use Stable Diffusion for demonstration (thanks for open-sourcing!). 
 
 
+# Adversarial Attack & Black-box Query
+![Teaser image](./assets/teaser_4.jpg)
 
 # Evaluation
 We use different types of CLIP text encoder (e.g., RN50, ViT-B/32, ViT-L/14, etc.) to evaluate the similarity between (a) the generated response and (b) the predefined targeted text $\boldsymbol{c}_\text{tar}$. Refer to the following eval script as an example:
@@ -76,6 +82,8 @@ python eval_clip_text_score.py \
 --pred_text_path ./_output_text/your_pred_captions.txt \
 --tgt_text_path ./_output_text/your_tgt_captions.txt \
 ```
+
+Alternatively, you can use [`wandb`](https://wandb.ai/site) to dynamically monitor the moving average of the CLIP score.
 
 # Bibtex
 If you find this project useful in your research, please consider citing our paper:
