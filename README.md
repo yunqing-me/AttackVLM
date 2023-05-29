@@ -52,7 +52,7 @@ In other words, we mislead and let the VLMs say what you want, regardless of the
 - lmdb, tqdm
 - wandb, torchvision, etc.
 
-As we apply [Stable Diffusion](https://github.com/CompVis/stable-diffusion) for targeted image generation, we init our [conda](https://docs.conda.io/en/latest/) environment following [Latent Diffusion Models](https://github.com/CompVis/latent-diffusion). In other words, a suitable base conda environment named `ldm` can be created and activated with:
+As we apply [Stable Diffusion](https://github.com/CompVis/stable-diffusion) for targeted image generation, we init our [conda](https://docs.conda.io/en/latest/) environment following [Latent Diffusion Models](https://github.com/CompVis/latent-diffusion). A suitable base conda environment named `ldm` can be created and activated with:
 ```
 conda env create -f environment.yaml
 conda activate ldm
@@ -175,6 +175,16 @@ If you find this project useful in your research, please consider citing our pap
   title={On Evaluating Adversarial Robustness of Large Vision-Language Models},
   author={Zhao, Yunqing and Pang, Tianyu and Du, Chao and Yang, Xiao and Li, Chongxuan and Cheung, Ngai-Man and Lin, Min},
   journal={arXiv preprint arXiv:2305.16934},
+  year={2023}
+}
+```
+
+Meanwhile, a relevant research that aims to [Embedding a Watermark to (multi-modal) Diffusion Models](https://github.com/yunqing-me/WatermarkDM):
+```
+@article{zhao2023recipe,
+  title={A Recipe for Watermarking Diffusion Models},
+  author={Zhao, Yunqing and Pang, Tianyu and Du, Chao and Yang, Xiao and Cheung, Ngai-Man and Lin, Min},
+  journal={arXiv preprint arXiv:2303.10137},
   year={2023}
 }
 ```
