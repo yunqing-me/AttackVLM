@@ -25,7 +25,7 @@
 <b>
     <a href="" target="_blank" style="text-decoration: none;">Project Page</a>&nbsp;/&nbsp;
     <a href="" target="_blank" style="text-decoration: none;">Slides</a>&nbsp;/&nbsp;
-    <a href="" target="_blank" style="text-decoration: none;">arXiv</a>&nbsp;/&nbsp;
+    <a href="https://arxiv.org/pdf/2305.16934.pdf" target="_blank" style="text-decoration: none;">arXiv</a>&nbsp;/&nbsp;
     <a href="https://drive.google.com/drive/folders/118MTDLEw0YefC-Z0eGllKNAx_aavBrFP?usp=sharing" target="_blank" style="text-decoration: none;">Data Repository</a>&nbsp;
 </b>
 </p>
@@ -86,8 +86,8 @@ https://drive.google.com/file/d/1e5W3Yim7ZJRw3_C64yqVZg_Na7dOawaF/view?usp=shari
 The targeted images $\boldsymbol{h}_\xi(\boldsymbol{c}_\text{tar})$ can be obtained via Stable Diffusion by reading text prompt from the sampled COCO captions, with the script below (note that hyperparameters can be adjusted with your preference):
 
 ```
-CUDA_VISIBLE_DEVICES=0 \
-python ./scripts/txt2img.py --ddim_eta 0.0 \
+python ./scripts/txt2img.py \
+        --ddim_eta 0.0 \
         --n_samples 10 \
         --n_iter 1 \
         --scale 7.5 \
@@ -96,9 +96,9 @@ python ./scripts/txt2img.py --ddim_eta 0.0 \
         --skip_grid \
         --ckpt ./_model_pool/sd-v1-4-full-ema.ckpt \
         --from-file './name_of_your_coco_captions_file.txt' \
-        --outdir ./path_of_your_targeted_images \
+        --outdir './path_of_your_targeted_images' \
 ```
-Additional details of text-to-image generation by Stable Diffusion can be found [HERE](https://github.com/CompVis/stable-diffusion#:~:text=active%20community%20development.-,Reference%20Sampling%20Script,-We%20provide%20a).
+Additional implementation details of text-to-image generation by Stable Diffusion can be found [HERE](https://github.com/CompVis/stable-diffusion#:~:text=active%20community%20development.-,Reference%20Sampling%20Script,-We%20provide%20a).
 
 # Adversarial Attack & Black-box Query
 
@@ -119,54 +119,50 @@ then, create a suitable conda environment following the steps [HERE](https://git
 - Transfer-based attacking strategy
 
 ```
-CUDA_VISIBLE_DEVICES=0 \
 python _train_adv_img.py \
---output unidiff_adv_transfer \
---batch_size 250 \
---num_samples 10000 \
---steps 100 \
---output 'name_of_your_output_img_folder' \
+        --output unidiff_adv_transfer \
+        --batch_size 250 \
+        --num_samples 10000 \
+        --steps 100 \
+        --output 'name_of_your_output_img_folder' \
 ```
 then perform image-to-text and store the response of $\boldsymbol{x}_\text{trans}$, this can be achieved by:
 
 ```
-CUDA_VISIBLE_DEVICES=0 \
 python _eval_adv_img_i2t.py \
---batch_size 10 \
---mode i2t \
---img_path './_output_img/name_of_your_output_img_folder' \
---output_path 'name_of_your_output_txt_file' \
+        --batch_size 10 \
+        --mode i2t \
+        --img_path './_output_img/name_of_your_output_img_folder' \
+        --output_path 'name_of_your_output_txt_file' \
 ```
 
 - Query-based attacking strategy (via RGF-estimator)
 
 ```
-CUDA_VISIBLE_DEVICES=0 \
 python _train_adv_img_query.py \
---output unidiff_adv_query \
---text_path '../_output_text/name_of_your_output_txt_file.txt' \
---batch_size 1 \
---num_samples 10000 \
---steps 8 \
---sigma 8 \
---delta 'zero' \
---num_query 50 \
---num_sub_query 25 \
---wandb \
---wandb_project_name tmp \
---wandb_run_name tmp \
+        -output unidiff_adv_query \
+        --text_path '../_output_text/name_of_your_output_txt_file.txt' \
+        --batch_size 1 \
+        --num_samples 10000 \
+        --steps 8 \
+        --sigma 8 \
+        --delta 'zero' \
+        --num_query 50 \
+        --num_sub_query 25 \
+        --wandb \
+        --wandb_project_name tmp \
+        --wandb_run_name tmp \
 ```
 
 # Evaluation
 We use different types of CLIP text encoder (e.g., RN50, ViT-B/32, ViT-L/14, etc.) to evaluate the similarity between (a) the generated response and (b) the predefined targeted text $\boldsymbol{c}_\text{tar}$. Refer to the following eval script as an example:
 
 ```
-CUDA_VISIBLE_DEVICES=0 \
 python eval_clip_text_score.py \
---batch_size 250 \
---num_samples 10000 \
---pred_text_path ./_output_text/your_pred_captions.txt \
---tgt_text_path ./_output_text/your_tgt_captions.txt \
+        --batch_size 250 \
+        --num_samples 10000 \
+        --pred_text_path ./_output_text/your_pred_captions.txt \
+        --tgt_text_path ./_output_text/your_tgt_captions.txt \
 ```
 
 Alternatively, you can use [`wandb`](https://wandb.ai/site) to dynamically monitor the moving average of the CLIP score, this is because the query-based attack might be slow when processing abundant perturbed samples at the same time. 
@@ -178,7 +174,7 @@ If you find this project useful in your research, please consider citing our pap
 @article{zhao2023evaluate,
   title={On Evaluating Adversarial Robustness of Large Vision-Language Models},
   author={Zhao, Yunqing and Pang, Tianyu and Du, Chao and Yang, Xiao and Li, Chongxuan and Cheung, Ngai-Man and Lin, Min},
-  journal={arXiv preprint arXiv:2305},
+  journal={arXiv preprint arXiv:2305.16934},
   year={2023}
 }
 ```
