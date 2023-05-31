@@ -23,7 +23,7 @@
 
 <p align='center' style="text-align:center;font-size:2.5 em;">
 <b>
-    <a href="https://yunqing-me.github.io/AttackVLM/" target="_blank" style="text-decoration: none;">Project Page</a>&nbsp;/&nbsp;
+    <a href="https://yunqing-me.github.io/AttackVLM/https://yunqing-me.github.io/AttackVLM/" target="_blank" style="text-decoration: none;">Project Page</a>&nbsp;/&nbsp;
     <a href="https://yunqing-me.github.io/AttackVLM/" target="_blank" style="text-decoration: none;">Slides</a>&nbsp;/&nbsp;
     <a href="https://arxiv.org/pdf/2305.16934.pdf" target="_blank" style="text-decoration: none;">arXiv</a>&nbsp;/&nbsp;
     <a href="https://drive.google.com/drive/folders/118MTDLEw0YefC-Z0eGllKNAx_aavBrFP?usp=sharing" target="_blank" style="text-decoration: none;">Data Repository</a>&nbsp;
