@@ -6,7 +6,7 @@
         content="Deformable Neural Radiance Fields creates free-viewpoint portraits (nerfies) from casually captured videos.">
   <meta name="keywords" content="Nerfies, D-NeRF, NeRF">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>On Evaluating Adversarial Robustnesss of Large Vision-Language Models</title>
+  <title>AttackVLM: On Evaluating Adversarial Robustnesss of Large Vision-Language Models</title>
 
   <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
@@ -88,7 +88,7 @@
           </div>
 
           <div class="is-size-5 publication-authors">
-            <span class="author-block"><sup>1</sup>Singapore University of Technology and Design (SUTD),</span><br>
+            <span class="author-block"><sup>1</sup>Singapore University of Technology and Design (SUTD)</span><br>
             <span class="author-block"><sup>2</sup>Sea AI Lab (SAIL), Singapore</span><br>
             <span class="author-block"><sup>2</sup>Tsinghua University</span>&nbsp;&nbsp;&nbsp;&nbsp;
             <span class="author-block"><sup>2</sup>Renmin University of China</span>
@@ -236,17 +236,20 @@
         <h2 class="title is-2" >Abstract</h2>
         <div class="content has-text-justified">
           <p>
-            Large vision-language models (VLMs) such as GPT-4 have achieved unprecedented performance in response generation, especially with visual inputs, enabling more creative and adaptable interaction than large language models such as ChatGPT. 
+            Large vision-language models (VLMs) such as GPT-4 have achieved unprecedented performance in response generation, especially with visual inputs, 
+            enabling more creative and adaptable interaction than large language models such as ChatGPT. 
+            Nonetheless, multimodal generation exacerbates safety concerns, 
+            since adversaries may successfully evade the entire system by subtly manipulating the most vulnerable modality (e.g., vision). 
             <p>
-            Nonetheless, multimodal generation exacerbates safety concerns, since adversaries may successfully evade the entire system by subtly manipulating the most vulnerable modality (e.g., vision). 
-            </p>
-            <p>
-            To this end, we propose evaluating the robustness of open-source large VLMs in the most realistic and high-risk setting, where adversaries have only black-box system access and seek to deceive the model into returning the targeted responses. 
+            To this end, we propose evaluating the robustness of open-source large VLMs in the most realistic and high-risk setting, 
+            where adversaries have only black-box system access and seek to deceive the model into returning the targeted responses. 
             In particular, we first craft targeted adversarial examples against pretrained models such as CLIP and BLIP, and then transfer these adversarial examples to other VLMs such as MiniGPT-4, LLaVA, UniDiffuser, BLIP-2, and Img2Prompt. 
-            In addition, we observe that black-box queries on these VLMs can further improve the effectiveness of targeted evasion, resulting in a surprisingly high success rate for generating targeted responses. 
+            In addition, we observe that black-box queries on these VLMs can further improve the effectiveness of targeted evasion, 
+            resulting in a surprisingly high success rate for generating targeted responses. 
             </p>
             <p>
-            Overall, Our investigation and findings in this work provide a quantitative understanding regarding the adversarial vulnerability of large VLMs and call for a more thorough examination of their potential security flaws before deployment in practice.
+            Overall, Our investigation and findings in this work provide a quantitative understanding 
+            regarding the adversarial vulnerability of large VLMs and call for a more thorough examination of their potential security flaws before deployment in practice.
             </p>
         </p>
         </div>
@@ -268,6 +271,260 @@
   </div>
 </section>
 
+<section class="section">
+  <div class="container is-max-desktop">
+
+    <div class="columns is-centered">
+
+      <!-- Visual Effects. -->
+      <!-- <div class="column">
+        <div class="content">
+          <h2 class="title is-3">Visual Effects</h2>
+          <p>
+            Using <i>nerfies</i> you can create fun visual effects. This Dolly zoom effect
+            would be impossible without nerfies since it would require going through a wall.
+          </p>
+          <video id="dollyzoom" autoplay controls muted loop playsinline height="100%">
+            <source src="./static/videos/dollyzoom-stacked.mp4"
+                    type="video/mp4">
+          </video>
+        </div>
+      </div> -->
+      <!--/ Visual Effects. -->
+
+      <!-- Matting. -->
+      <!-- <div class="column">
+        <h2 class="title is-3">Matting</h2>
+        <div class="columns is-centered">
+          <div class="column content">
+            <p>
+              As a byproduct of our method, we can also solve the matting problem by ignoring
+              samples that fall outside of a bounding box during rendering.
+            </p>
+            <video id="matting-video" controls playsinline height="100%">
+              <source src="./static/videos/matting.mp4"
+                      type="video/mp4">
+            </video>
+          </div>
+
+        </div>
+      </div>
+    </div> -->
+    <!--/ Matting. -->
+
+    <!-- Animation. -->
+    <div class="columns is-centered">
+      <!-- <div class="column is-full-width"> -->
+        <!-- <h2 class="title is-3">Animation</h2> -->
+
+        <!-- Interpolating. -->
+        <!-- <h3 class="title is-4">Interpolating states</h3>
+        <div class="content has-text-justified">
+          <p>
+            We can also animate the scene by interpolating the deformation latent codes of two input
+            frames. Use the slider here to linearly interpolate between the left frame and the right
+            frame.
+          </p>
+        </div>
+        <div class="columns is-vcentered interpolation-panel">
+          <div class="column is-3 has-text-centered">
+            <img src="./static/images/interpolate_start.jpg"
+                 class="interpolation-image"
+                 alt="Interpolate start reference image."/>
+            <p>Start Frame</p>
+          </div>
+          <div class="column interpolation-video-column">
+            <div id="interpolation-image-wrapper">
+              Loading...
+            </div>
+            <input class="slider is-fullwidth is-large is-info"
+                   id="interpolation-slider"
+                   step="1" min="0" max="100" value="0" type="range">
+          </div>
+          <div class="column is-3 has-text-centered">
+            <img src="./static/images/interpolate_end.jpg"
+                 class="interpolation-image"
+                 alt="Interpolation end reference image."/>
+            <p class="is-bold">End Frame</p>
+          </div>
+        </div>
+        <br/> -->
+        <!--/ Interpolating. -->
+
+        <!-- Re-rendering. -->
+        <!-- <h3 class="title is-4">Re-rendering the input video</h3>
+        <div class="content has-text-justified">
+          <p>
+            Using <span class="dnerf">Nerfies</span>, you can re-render a video from a novel
+            viewpoint such as a stabilized camera by playing back the training deformations.
+          </p>
+        </div>
+        <div class="content has-text-centered">
+          <video id="replay-video"
+                 controls
+                 muted
+                 preload
+                 playsinline
+                 width="75%">
+            <source src="./static/videos/replay.mp4"
+                    type="video/mp4">
+          </video>
+        </div> -->
+        <!--/ Re-rendering. -->
+
+      </div>
+    </div>
+    <!-- / Animation. -->
+
+
+    <!-- Overview -->
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Overview of Proposed Method</h2>
+
+        <div class="content has-text-justified">
+			<center>
+				<table align=center width=880px>
+					<tr>
+						<td width=260px>
+							<center>
+								<img class="round" style="width:880px" src="./assets/teaser_4.jpg"/>
+							</center>
+						</td>
+					</tr>
+				</table>
+				<!-- <table align=center width=880px>
+					<tr>
+						<td>
+							<p style="text-align:justify; text-justify:inter-ideograph;">
+                <h4 class="title is-5">Contributions</h4>
+							<b>1: </b>
+							We consider the problem of FSIG with Transfer Learning using very limited target samples (e.g., 10-shot). <br>
+							<b>2: </b>
+							Our work makes two contributions: 
+							<ul>
+								<li>We discover that when the close proximity assumption between source-target domain is relaxed, SOTA FSIG methods, e.g., EWC (Li et al.), CDC (Ojha et al.), DCL (Zhao et al.), 
+                  which consider only source domain/source task in knowledge preserving perform no better than a baseline fine-tuning method, e.g., TGAN, (Wang et al.).</li>
+								<li>We propose a novel adaptation-aware kernel modulation for FSIG that achieves SOTA performance across source / target domains with different proximity. </li>
+							</ul>
+							<b>3: </b>
+							Schematic diagram of our proposed Importance Probing Mechanism: 
+              We measure the importance of each kernel for the target domain after probing and preserve source domain knowledge that is important for target domain adaptation. 
+              The same operations are applied to discriminator.
+						</td>
+					</tr>
+				</table> -->
+				<table align=center width=880px>
+					<tr>
+						<td width=260px>
+							<!-- <center>
+								<img class="round" style="width:880px" src="./resources/method.jpg"/>
+							</center> -->
+						</td>
+					</tr>
+				</table>
+			</center>
+        </div>
+      </div>
+    </div>
+    <!--/ Overview -->
+
+    <!-- Experiment-->
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3">Experiment Results</h2>
+
+        <div class="content has-text-justified">
+			<center>
+				<table align=center width=880px>
+					<tr>
+						<td width=260px>
+							<center>
+								<img class="round" style="width:880px" src="./assets/teaser_minigpt4.jpg"/>
+							</center>
+						</td>
+					</tr>
+				</table>
+        <table align=center width=850px>
+          <center>
+            <tr>
+              <td>
+                <p style="text-align:justify; text-justify:inter-ideograph;"> 
+                  <b>Visual question-answering (VQA) task implemented by MiniGPT-4.</b> MiniGPT-4 has
+                  capabilities for vision-language understanding and performs comparably to GPT-4 on tasks such
+                  as multi-round VQA by leveraging the knowledge of large LMs. We select images with refined
+                  details generated by Midjourney [48] and feed questions (e.g., Can you tell me what is the
+                  interesting point of this image?) into MiniGPT-4. As expected, MiniGPT-4 can return
+                  descriptions that are intuitively reasonable, and when we ask additional questions (e.g., But is this
+                  a common scene in the normal life?), MiniGPT-4 demonstrates the capacity for accurate
+                  multi-round conversation. Nevertheless, after being fed targeted adversarial images, MiniGPT-4 will
+                  return answers related to the targeted description (e.g., A robot is playing in the field).
+                  This adversarial effect can even affect multi-round conversations when we ask additional questions.
+              </td>
+            </tr>
+          </center>
+        </table>
+				<table align=center width=880px>
+					<tr>
+						<td width=260px>
+              <center>
+                <img class="round" style="width:880px" src="./assets/teaser_unidiff.jpg"/>
+              </center>
+						</td>
+					</tr>
+				</table>
+        <table align=center width=850px>
+          <center>
+            <tr>
+              <td>
+                <p style="text-align:justify; text-justify:inter-ideograph;"> 
+                  <b> Joint generation task implemented by UniDiffuser.</b> There are generative VLMs such as
+                  UniDiffuser that model the joint distribution of image-text pairs and are capable of both image-to-text
+                  and text-to-image generation. Consequently, given an original text description (e.g., An oil painting of a bridge in rains. Monet Style), 
+                  the text-to-image direction of UniDiffuser is used to generate the corresponding clean image, 
+                  and its image-to-text direction can recover a text response (e.g., A painting of a bridge at night by Monet) similar to the original text description. 
+                  The recovering between image and text modalities can be performed consistently on clean images. 
+                  When a targeted adversarial perturbation is added to a clean image, however, the image-to-text direction of UniDiffuser will return a text 
+                  (e.g., A small white dog sitting in the grass near a stream in Autumn) that semantically resembles the predefined targeted description 
+                  (e.g., A small white dog sitting on the ground in autumn leaves), thereby affecting the subsequent chains of recovering processes.
+              </td>
+            </tr>
+          </center>
+        </table>
+				<table align=center width=880px>
+					<tr>
+						<td width=260px>
+              <center>
+                <img class="round" style="width:880px" src="./assets/teaser_blip2.jpg"/>
+              </center>
+						</td>
+					</tr>
+				</table>
+        <table align=center width=850px>
+          <center>
+            <tr>
+              <td>
+                <p style="text-align:justify; text-justify:inter-ideograph;"> 
+                  <b> Image captioning task implemented by BLIP-2.</b> Given an original text description, 
+                  DALL-E/Midjourney/Stable Diffusion is used to generate corresponding
+                  clean images. Note that real images can also be the clean image. 
+                  BLIP-2 accurately returns captioning text (e.g., A field with yellow flowers and a sky full of clouds) 
+                  that analogous to the original text description / the content on the clean image. 
+                  After the clean image is maliciously perturbed by targeted adversarial noises, the adversarial image can mislead
+                  BLIP-2 to return a caption (e.g., A cartoon drawn on the side of an old computer) that semantically resembles the predefined targeted response 
+                  (e.g., A computer from the 90s in the style of vaporwave). 
+              </td>
+            </tr>
+          </center>
+        </table>
+			</center>
+        </div>
+      </div>
+    </div>
+    <!--/ Overview -->
+    
+  </div>
+</section>
 
 <section class="section">
   <div class="container is-max-desktop">
