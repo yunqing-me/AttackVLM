@@ -98,6 +98,8 @@ python ./scripts/txt2img.py \
         --from-file './name_of_your_coco_captions_file.txt' \
         --outdir './path_of_your_targeted_images' \
 ```
+where the ckpt is provided by [Stable Diffusion v1](https://github.com/CompVis/stable-diffusion#weights:~:text=The%20weights%20are%20available%20via) and can be downloaded here: [sd-v1-4-full-ema.ckpt](https://huggingface.co/CompVis/stable-diffusion-v-1-4-original/resolve/main/sd-v1-4-full-ema.ckpt).
+
 Additional implementation details of text-to-image generation by Stable Diffusion can be found [HERE](https://github.com/CompVis/stable-diffusion#:~:text=active%20community%20development.-,Reference%20Sampling%20Script,-We%20provide%20a).
 
 # Adversarial Attack & Black-box Query
