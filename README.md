@@ -10,7 +10,7 @@
     <a href="https://linmin.me/" target="_blank" style="text-decoration: none;">Min Lin<sup>2</sup></a> &nbsp;&nbsp;&nbsp;&nbsp; </br>
     <sup>*</sup>Equal Contribution&nbsp;&nbsp;&nbsp;&nbsp;<sup>&#8224</sup>Equal Advice
     <br/> 
-<sup>1</sup>Singapore University of Technology and Design<br/> 
+<sup>1</sup>Singapore University of Technology and Design &nbsp;&nbsp;
 <sup>2</sup>Sea AI Lab (SAIL), Singapore <br/>
 <sup>3</sup>Tsinghua University &nbsp;&nbsp;
 <sup>4</sup>Renmin University of China
@@ -22,7 +22,7 @@
 </b>
 </p>
 
-<p align='center' style="text-align:left;font-size:1.2em;">
+<p align='left' style="text-align:left;font-size:1.2em;">
 <b>
     [<a href="https://yunqing-me.github.io/AttackVLM/" target="_blank" style="text-decoration: none;">Project Page</a>] |
     [<a href="https://yunqing-me.github.io/AttackVLM/" target="_blank" style="text-decoration: none;">Slides</a>] |
