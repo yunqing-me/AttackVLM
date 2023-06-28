@@ -7,9 +7,10 @@
     <a href="https://ml.cs.tsinghua.edu.cn/~xiaoyang/" target="_blank" style="text-decoration: none;">Xiao Yang <sup>3</sup> </a>&nbsp;,&nbsp;
     <a href="https://zhenxuan00.github.io/" target="_blank" style="text-decoration: none;">Chongxuan Li <sup>4</sup> </a><br/>
     <a href="https://sites.google.com/site/mancheung0407/" target="_blank" style="text-decoration: none;">Ngai&#8209;Man Cheung<sup>1&#8224</sup></a>&nbsp;,&nbsp; 
-    <a href="https://linmin.me/" target="_blank" style="text-decoration: none;">Min Lin<sup>2</sup></a> &nbsp;&nbsp;&nbsp;&nbsp; <sup>*</sup>Equal Contribution
+    <a href="https://linmin.me/" target="_blank" style="text-decoration: none;">Min Lin<sup>2</sup></a> &nbsp;&nbsp;&nbsp;&nbsp; </br>
+    <sup>*</sup>Equal Contribution&nbsp;&nbsp;&nbsp;&nbsp;<sup>&#8224</sup>Equal Advice
     <br/> 
-<sup>1</sup>Singapore University of Technology and Design (SUTD)<br/> 
+<sup>1</sup>Singapore University of Technology and Design<br/> 
 <sup>2</sup>Sea AI Lab (SAIL), Singapore <br/>
 <sup>3</sup>Tsinghua University &nbsp;&nbsp;
 <sup>4</sup>Renmin University of China
@@ -21,12 +22,12 @@
 </b>
 </p>
 
-<p align='center' style="text-align:center;font-size:2.5 em;">
+<p align='center' style="text-align:left;font-size:1.2em;">
 <b>
-    <a href="https://yunqing-me.github.io/AttackVLM/" target="_blank" style="text-decoration: none;">Project Page</a>&nbsp;/&nbsp;
-    <a href="https://yunqing-me.github.io/AttackVLM/" target="_blank" style="text-decoration: none;">Slides</a>&nbsp;/&nbsp;
-    <a href="https://arxiv.org/pdf/2305.16934.pdf" target="_blank" style="text-decoration: none;">arXiv</a>&nbsp;/&nbsp;
-    <a href="https://drive.google.com/drive/folders/118MTDLEw0YefC-Z0eGllKNAx_aavBrFP?usp=sharing" target="_blank" style="text-decoration: none;">Data Repository</a>&nbsp;
+    [<a href="https://yunqing-me.github.io/AttackVLM/" target="_blank" style="text-decoration: none;">Project Page</a>] |
+    [<a href="https://yunqing-me.github.io/AttackVLM/" target="_blank" style="text-decoration: none;">Slides</a>] |
+    [<a href="https://arxiv.org/pdf/2305.16934.pdf" target="_blank" style="text-decoration: none;">arXiv</a>] | 
+    [<a href="https://drive.google.com/drive/folders/118MTDLEw0YefC-Z0eGllKNAx_aavBrFP?usp=sharing" target="_blank" style="text-decoration: none;">Data Repository</a>]&nbsp;
 </b>
 </p>
 
@@ -77,13 +78,14 @@ then, prepare the full targeted captions from [MS-COCO](https://cocodataset.org/
 ```
 https://drive.google.com/file/d/19tT036LBvqYonzI7PfU9qVi3jVGApKrg/view?usp=sharing
 ```
-and move it to ```./stable-diffusion/```. In experiments, one can randomly sample a subset of COCO captions (e.g., `10`, `100`, `1K`, `10K`, `50K`) for the adversarial attack. For example, lets assume we have randomly sampled `10K` COCO captions as our targeted text $\boldsymbol{c}_\text{tar}$ and stored them in the following file:
+and move it to ```./stable-diffusion/```. In experiments, one can randomly sample a subset of COCO captions (e.g., `10`, `100`, `1K`, `10K`, `50K`) for the adversarial attack. For example, lets assume we have randomly sampled `10K` COCO captions as our targeted text c_tar and stored them in the following file:
 ```
 https://drive.google.com/file/d/1e5W3Yim7ZJRw3_C64yqVZg_Na7dOawaF/view?usp=sharing
 ```
 
 ## Generate the targeted images
-The targeted images $\boldsymbol{h}_\xi(\boldsymbol{c}_\text{tar})$ can be obtained via Stable Diffusion by reading text prompt from the sampled COCO captions, with the script below (note that hyperparameters can be adjusted with your preference):
+The targeted images h_ξ(c_tar) can be obtained via Stable Diffusion by reading text prompt from the sampled COCO captions, with the script below (note that hyperparameters can be adjusted with your preference):
+<!-- $\boldsymbol{h}_\xi(\boldsymbol{c}_\text{tar})$ -->
 
 ```
 python ./scripts/txt2img.py \
@@ -135,7 +137,7 @@ python _train_adv_img.py \
         --tgt_data_path 'path_of_your_tgt_data_folders' \
         --output 'name_of_your_output_img_folder'
 ```
-the crafted adv images $\boldsymbol{x}_\text{trans}$ will be stored in `../_output_img/name_of_your_output_img_folder`. Then, we perform image-to-text and store the generated response of $\boldsymbol{x}_\text{trans}$. This can be achieved by:
+the crafted adv images x_trans will be stored in `../_output_img/name_of_your_output_img_folder`. Then, we perform image-to-text and store the generated response of x_trans. This can be achieved by:
 
 ```
 python _eval_i2t_dataset.py \
@@ -166,7 +168,7 @@ python _train_adv_img_query.py \
 ```
 
 # Evaluation
-We use different types of CLIP text encoder (e.g., RN50, ViT-B/32, ViT-L/14, etc.) to evaluate the similarity between (a) the generated response and (b) the predefined targeted text $\boldsymbol{c}_\text{tar}$. Refer to the following eval script as an example:
+We use different types of CLIP text encoder (e.g., RN50, ViT-B/32, ViT-L/14, etc.) to evaluate the similarity between (a) the generated response and (b) the predefined targeted text c_tar. Refer to the following eval script as an example:
 
 ```
 python eval_clip_text_score.py \
