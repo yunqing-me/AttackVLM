@@ -84,11 +84,11 @@ https://drive.google.com/file/d/1e5W3Yim7ZJRw3_C64yqVZg_Na7dOawaF/view?usp=shari
 ```
 
 ## Generate the targeted images
-The targeted images h_ξ(c_tar) can be obtained via Stable Diffusion by reading text prompt from the sampled COCO captions, with the script below (note that hyperparameters can be adjusted with your preference):
+The targeted images h_ξ(c_tar) can be obtained via Stable Diffusion by reading text prompt from the sampled COCO captions, with the script below and [`txt2img_coco.py`](https://drive.google.com/file/d/1hTHxlgdx97_uEL3g9AmVx-qGNgssJeIy/view?usp=sharing) (please move `txt2img_coco.py` to ```./stable-diffusion/```, note that hyperparameters can be adjusted with your preference):
 <!-- $\boldsymbol{h}_\xi(\boldsymbol{c}_\text{tar})$ -->
 
 ```
-python ./scripts/txt2img.py \
+python txt2img_coco.py \
         --ddim_eta 0.0 \
         --n_samples 10 \
         --n_iter 1 \
