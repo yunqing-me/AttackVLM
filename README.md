@@ -1,6 +1,6 @@
 <h1 align='center' style="text-align:center; font-weight:bold; font-size:2.0em;letter-spacing:2.0px;">
                 On Evaluating Adversarial Robustness of </br> Large Vision-Language Models </h1>
-<p align='center' style="text-align:center;font-size:1.25em;">
+<!-- <p align='center' style="text-align:center;font-size:1.25em;">
     <a href="https://scholar.google.com/citations?user=kQA0x9UAAAAJ&hl=en" target="_blank" style="text-decoration: none;">Yunqing Zhao<sup>*1</sup></a>&nbsp;,&nbsp;
     <a href="https://p2333.github.io/" target="_blank" style="text-decoration: none;">Tianyu Pang<sup>*2&#8224</sup></a>&nbsp;,&nbsp;
     <a href="https://duchao0726.github.io/" target="_blank" style="text-decoration: none;">Chao Du<sup>2&#8224</sup></a>&nbsp;,&nbsp;
@@ -14,9 +14,9 @@
 <sup>2</sup>Sea AI Lab (SAIL), Singapore <br/>
 <sup>3</sup>Tsinghua University &nbsp;&nbsp;
 <sup>4</sup>Renmin University of China
-</p>
+</p> -->
 
-<p align='center';>
+<p align='center' style=font-size:1.2em;>
 <b>
 <em>arXiv-Preprint, 2023</em> <br>
 </b>
@@ -36,11 +36,11 @@
 
 ### TL, DR: 
 ```
-In this research, we evaluate the adversarial robustness of recent large vision-language models (VLMs), under the most realistic and challenging setting with threat model of black-box access and targeted goal.
+In this research, we evaluate the adversarial robustness of recent large vision-language (generative) models (VLMs), under the most realistic and challenging setting with threat model of black-box access and targeted goal.
 
 Our proposed method aims for the targeted response generation over large VLMs such as MiniGPT-4, LLaVA, Unidiffuser, BLIP/2, Img2Prompt, etc.
 
-In other words, we mislead and let the VLMs say what you want, regardless of the content of the input images.
+In other words, we mislead and let the VLMs say what you want, regardless of the content of the input image query.
 ```
 
 ![Teaser image](./assets/teaser_1.jpg)
