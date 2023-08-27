@@ -111,9 +111,9 @@ Additional implementation details of text-to-image generation by Stable Diffusio
 
 ## Prepare the VLM scripts
 
-There are two steps of adversarial attack for VLMs: (1) transfer-based attacking strategy and (2) query-based attacking strategy. Here, we use [Unidiffuser](https://github.com/thu-ml/unidiffuser) for an example, and other types of VLMs will be supported soon.
+There are two steps of adversarial attack for VLMs: (1) transfer-based attacking strategy and (2) query-based attacking strategy for the further improvement. For BLIP/BLIP-2/Img2Prompt Models, please refer to ```./LAVIS_tool```. The MiniGPT-4 and LLaVA will be also supported. Here, we use [Unidiffuser](https://github.com/thu-ml/unidiffuser) for an example. 
 
-### <b> Unidiffuser </b>
+### <b> Example: Unidiffuser </b>
 - Installation
 ```
 git clone https://github.com/thu-ml/unidiffuser.git
@@ -168,17 +168,19 @@ python _train_adv_img_query.py \
 ```
 
 # Evaluation
-We use different types of CLIP text encoder (e.g., RN50, ViT-B/32, ViT-L/14, etc.) to evaluate the similarity between (a) the generated response and (b) the predefined targeted text c_tar. Refer to the following eval script as an example:
+We use different types of CLIP text encoder (e.g., RN50, ViT-B/32, ViT-L/14, etc.) to evaluate the similarity between (a) the generated response and (b) the predefined targeted text c_tar. 
+
+We used [`wandb`](https://wandb.ai/site) to dynamically monitor the moving average of the CLIP score, this is because the black-box query-based attack might be slow when processing abundant perturbed samples at the same time. Please refer to ```_train_adv_img_query.py``` for details.
+
+For the offline evaluation, here is an example script for your reference:
 
 ```
 python eval_clip_text_score.py \
-        --batch_size 250 \
+        --batch_size 1 \
         --num_samples 10000 \
         --pred_text_path ../_output_text/your_pred_captions.txt \
         --tgt_text_path ../_output_text/your_tgt_captions.txt \
 ```
-
-Alternatively, you can use [`wandb`](https://wandb.ai/site) to dynamically monitor the moving average of the CLIP score, this is because the black-box query-based attack might be slow when processing abundant perturbed samples at the same time. 
 
 # Bibtex
 If you find this project useful in your research, please consider citing our paper:
