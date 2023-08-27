@@ -53,7 +53,7 @@ In other words, we mislead and let the VLMs say what you want, regardless of the
 - lmdb, tqdm
 - wandb, torchvision, etc.
 
-As we apply [Stable Diffusion](https://github.com/CompVis/stable-diffusion) for targeted image generation, we init our [conda](https://docs.conda.io/en/latest/) environment following [Latent Diffusion Models](https://github.com/CompVis/latent-diffusion). A suitable base conda environment named `ldm` can be created and activated with:
+In our work, we used DALL-E, Midjourney and Stable Diffusion for the target image generation and demonstration. For the large-scale experiments, we apply [Stable Diffusion](https://github.com/CompVis/stable-diffusion) for target image generation. To install Stable Diffusion, we init our [conda](https://docs.conda.io/en/latest/) environment following [Latent Diffusion Models](https://github.com/CompVis/latent-diffusion). A suitable base conda environment named `ldm` can be created and activated with:
 ```
 conda env create -f environment.yaml
 conda activate ldm
