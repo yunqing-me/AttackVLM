@@ -1,6 +1,6 @@
 
 
-## Prepare the VLMs
+## Prepare the VLMs in LAVIS Lib
 
 There are two steps of adversarial attack for VLMs: (1) transfer-based attacking strategy and (2) query-based attacking strategy for the further improvement.
 
@@ -17,48 +17,23 @@ or following the steps [HERE](https://github.com/salesforce/LAVIS), and you can 
 
 ## <b> Example: BLIP </b>
 
+Here, we use BLIP for an example. For other models supported in the LAVIS library, please refer to their ```bash``` script (BLIP2, Img2Prompt, etc.) with similar commands as BLIP.
 ### Transfer-based attacking strategy
 
 ```
-python _train_adv_img_blip.py  \
- --batch_size 50 \
- --num_samples 10000 \
- --steps 300 \
- --output "blip_adv" \
- --model_name "blip_caption" \
- --model_type "base_coco" \
+bash_adv_img_transfer_blip.sh
 ```
 the crafted adv images x_trans will be stored in `../_output_img/name_of_your_output_img_folder`. Then, we perform image-to-text and store the generated response of x_trans. This can be achieved by:
 
 ```
-python _lavis_img2txt.py  \
- --batch_size 50 \
- --num_samples 10000 \
- --img_path '../_output_img/blip_1_adv' \
- --output_path "blip_1_adv" \
- --model_name "blip_caption" \
- --model_type "base_coco" \
-
+bash_img2txt_blip.sh
 ```
 where the generated responses will be stored in `./output_unidiffuser/name_of_your_output_txt_file.txt`. We will use them for pseudo-gradient estimation via RGF-estimator.
 
 ### Query-based attacking strategy (via RGF-estimator)
 
 ```
-python _train_adv_img_query.py \
- --text_path '../_output_text/blip_1_adv_pred.txt' \
- --model_name blip_caption \
- --model_type base_coco \
- --batch_size 1 \
- --num_samples 1000 \
- --steps 8 \
- --sigma 8 \
- --delta 'zero' \
- --num_query 50 \
- --num_sub_query 50 \
- --wandb \
- --wandb_project_name blip_1_adv_query \
- --wandb_run_name sigma_8_zero_delta \
+bash_adv_img_query_blip.sh
 ```
 
 

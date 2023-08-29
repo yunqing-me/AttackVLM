@@ -10,7 +10,7 @@ from PIL import Image
 from tqdm import tqdm
 import time
 
-from lavis.common.gradcam import getAttMap
+# from lavis.common.gradcam import getAttMap
 from lavis.models import load_model_and_preprocess
 
 
