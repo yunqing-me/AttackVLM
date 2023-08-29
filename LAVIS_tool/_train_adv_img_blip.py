@@ -40,19 +40,6 @@ def to_tensor(pic):
     img = img.view(pic.size[1], pic.size[0], len(pic.getbands()))
     img = img.permute((2, 0, 1)).contiguous()
     return img.to(dtype=torch.get_default_dtype())
-
-# class ImageFolderWithPaths(torchvision.datasets.ImageFolder):
-#     def __init__(self, root, processor, transform = None, target_transform = None, loader = ..., is_valid_file = None):
-#         super().__init__(root, transform, target_transform, loader, is_valid_file)
-#         self.processor = processor
-        
-#     def __getitem__(self, index: int):
-#         original_tuple = super().__getitem__(index)  # (img, label)
-#         path, _ = self.samples[index]  # path: str
-
-#         image_processed = self.processor["eval"](original_tuple[0])
-        
-#         return image_processed, original_tuple[1], path
     
 
 class ImageFolderWithPaths(torchvision.datasets.ImageFolder):
