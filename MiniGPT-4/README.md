@@ -18,19 +18,19 @@ or following the steps [HERE](https://github.com/Vision-CAIR/MiniGPT-4), and you
 ### Transfer-based attacking strategy
 
 ```
-bash _train_adv_img_minigpt4.sh
+bash _train_adv_img_transfer_minigpt4.sh
 ```
 the crafted adv images x_trans will be stored in `../_output_img/name_of_your_output_img_folder`. Then, we perform image-to-text and store the generated response of x_trans. This can be achieved by:
 
 ```
-bash img2txt_minigpt4.sh
+bash _minigpt4_img2txt.sh
 ```
-where the generated responses will be stored in `./output_unidiffuser/name_of_your_output_txt_file.txt`. We will use them for pseudo-gradient estimation via RGF-estimator.
+where the generated responses will be stored in `./output_minigpt4/name_of_your_output_txt_file.txt`. We will use them for pseudo-gradient estimation via RGF-estimator.
 
 ### Query-based attacking strategy (via RGF-estimator)
 
 ```
-bash adv_img_query_minigpt4.sh
+bash _train_adv_img_query_minigpt4.sh
 ```
 
 
