@@ -163,24 +163,13 @@ python _train_adv_img_query.py \
         --num_query 50 \
         --num_sub_query 25 \
         --wandb \
-        --wandb_project_name tmp \
-        --wandb_run_name tmp \
+        --wandb_project_name unidiffuser \
+        --wandb_run_name sigma_8_delta_zero \
 ```
 
 # Evaluation
-We use different types of CLIP text encoder (e.g., RN50, ViT-B/32, ViT-L/14, etc.) to evaluate the similarity between (a) the generated response and (b) the predefined targeted text c_tar. 
+We use [`wandb`](https://wandb.ai/site) to dynamically monitor the moving average of the CLIP score (e.g., RN50, ViT-B/32, ViT-L/14, etc.) to evaluate the similarity between (a) the generated response and (b) the predefined targeted text c_tar.
 
-We used [`wandb`](https://wandb.ai/site) to dynamically monitor the moving average of the CLIP score, this is because the black-box query-based attack might be slow when processing abundant perturbed samples at the same time. Please refer to ```_train_adv_img_query.py``` for details.
-
-For the offline evaluation, here is an example script for your reference:
-
-```
-python eval_clip_text_score.py \
-        --batch_size 1 \
-        --num_samples 10000 \
-        --pred_text_path ../_output_text/your_pred_captions.txt \
-        --tgt_text_path ../_output_text/your_tgt_captions.txt \
-```
 
 # Bibtex
 If you find this project useful in your research, please consider citing our paper:
