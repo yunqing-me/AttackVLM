@@ -219,8 +219,7 @@ if __name__ == "__main__":
         assert (vit_attack_results_vitl14 == query_attack_results_vitl14).all()
     ## ----------
     
-    if args.wandb:
-        run = wandb.init(project=args.wandb_project_name, name=args.wandb_run_name, reinit=True)
+    run = wandb.init(project=args.wandb_project_name, name=args.wandb_run_name, reinit=True)
     
     for i, (image, path) in enumerate(data_loader):
         if batch_size * (i+1) > args.num_samples:
@@ -333,38 +332,22 @@ if __name__ == "__main__":
                 if adv_txt_tgt_txt_score_in_current_step_vitl14 > query_attack_results_vitl14[i]:
                     query_attack_results_vitl14[i] = adv_txt_tgt_txt_score_in_current_step_vitl14
                     # ----------------
-                
-            # # log text
-            # with open(os.path.join("../_output_text", args.output + '_pred.txt'), 'a') as f:
-            #     print('\n'.join(unidiff_text_of_adv_image_in_current_step), file=f)
-            # f.close()
-            
-            # # save img
-            # os.makedirs(os.path.join('../_output_img', args.output), exist_ok=True)
-            # adv_image_to_save = torch.clamp((adv_image_in_current_step) / 255.0, 0.0, 1.0)
-            # for path_idx in range(len(path)):
-            #     folder, name = path[path_idx].split("/")[-2], path[path_idx].split("/")[-1]
-            #     folder_to_save = os.path.join('../_output_img', args.output, folder)
-            #     if not os.path.exists(folder_to_save):
-            #         os.makedirs(folder_to_save, exist_ok=True)
-            #     torchvision.utils.save_image(adv_image_to_save[path_idx], os.path.join(folder_to_save, name[:-3] + ".png"))
 
-        if args.wandb:
-            wandb.log(
-                {   
-                    "moving-avg-adv-rn50"    : np.mean(vit_attack_results_rn50[:(i+1)]),
-                    "moving-avg-query-rn50"  : np.mean(query_attack_results_rn50[:(i+1)]),
-                    
-                    "moving-avg-adv-rn101"   : np.mean(vit_attack_results_rn101[:(i+1)]),
-                    "moving-avg-query-rn101" : np.mean(query_attack_results_rn101[:(i+1)]),
-                    
-                    "moving-avg-adv-vitb16"  : np.mean(vit_attack_results_vitb16[:(i+1)]),
-                    "moving-avg-query-vitb16": np.mean(query_attack_results_vitb16[:(i+1)]),
-                    
-                    "moving-avg-adv-vitb32"  : np.mean(vit_attack_results[:(i+1)]),
-                    "moving-avg-query-vitb32": np.mean(query_attack_results[:(i+1)]),
-                    
-                    "moving-avg-adv-vitl14"  : np.mean(vit_attack_results_vitl14[:(i+1)]),
-                    "moving-avg-query-vitl14": np.mean(query_attack_results_vitl14[:(i+1)]),
-                }
-            )
+        wandb.log(
+            {   
+                "moving-avg-adv-rn50"    : np.mean(vit_attack_results_rn50[:(i+1)]),
+                "moving-avg-query-rn50"  : np.mean(query_attack_results_rn50[:(i+1)]),
+                
+                "moving-avg-adv-rn101"   : np.mean(vit_attack_results_rn101[:(i+1)]),
+                "moving-avg-query-rn101" : np.mean(query_attack_results_rn101[:(i+1)]),
+                
+                "moving-avg-adv-vitb16"  : np.mean(vit_attack_results_vitb16[:(i+1)]),
+                "moving-avg-query-vitb16": np.mean(query_attack_results_vitb16[:(i+1)]),
+                
+                "moving-avg-adv-vitb32"  : np.mean(vit_attack_results[:(i+1)]),
+                "moving-avg-query-vitb32": np.mean(query_attack_results[:(i+1)]),
+                
+                "moving-avg-adv-vitl14"  : np.mean(vit_attack_results_vitl14[:(i+1)]),
+                "moving-avg-query-vitl14": np.mean(query_attack_results_vitl14[:(i+1)]),
+            }
+        )

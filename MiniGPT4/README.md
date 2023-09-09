@@ -1,39 +1,36 @@
 
 
-## Prepare the VLMs in LAVIS Lib
+# Installation
 
-There are two steps of adversarial attack for VLMs: (1) transfer-based attacking strategy and (2) query-based attacking strategy for the further improvement.
 
-### Building a suitable LAVIS environment
+### Building a suitable MiniGPT-4 environment
 ```
-conda create -n lavis python=3.8
-conda activate lavis
-
-git clone https://github.com/salesforce/LAVIS.git
-cd LAVIS
-pip install -e .
+git clone https://github.com/Vision-CAIR/MiniGPT-4.git
+cd MiniGPT-4
+conda env create -f environment.yml
+conda activate minigpt4
 ```
-or following the steps [HERE](https://github.com/salesforce/LAVIS), and you can refer to the [ModelZoo](https://opensource.salesforce.com/LAVIS//latest/getting_started.html#model-zoo) for the possible model candidates.
+or following the steps [HERE](https://github.com/Vision-CAIR/MiniGPT-4), and you can refer to the [LLM weights](https://github.com/Vision-CAIR/MiniGPT-4#:~:text=Prepare%20the%20pretrained%20LLM%20weights) for the possible model candidates.
 
-## <b> Example: BLIP </b>
+## <b> MiniGPT-4 </b>
 
-Here, we use BLIP for an example. For other models supported in the LAVIS library, please refer to their ```bash``` script (BLIP2, Img2Prompt, etc.) with similar commands as BLIP.
+
 ### Transfer-based attacking strategy
 
 ```
-bash adv_img_transfer_blip.sh
+bash _train_adv_img_minigpt4.sh
 ```
 the crafted adv images x_trans will be stored in `../_output_img/name_of_your_output_img_folder`. Then, we perform image-to-text and store the generated response of x_trans. This can be achieved by:
 
 ```
-bash img2txt_blip.sh
+bash img2txt_minigpt4.sh
 ```
 where the generated responses will be stored in `./output_unidiffuser/name_of_your_output_txt_file.txt`. We will use them for pseudo-gradient estimation via RGF-estimator.
 
 ### Query-based attacking strategy (via RGF-estimator)
 
 ```
-bash adv_img_query_blip.sh
+bash adv_img_query_minigpt4.sh
 ```
 
 
