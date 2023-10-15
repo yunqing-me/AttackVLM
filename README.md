@@ -132,7 +132,7 @@ python _train_adv_img.py \
         --batch_size 250 \
         --num_samples 10000 \
         --steps 100 \
-        --epsilon 8 \
+        --epsilon 5 \  # you can modify the perturb budget here
         --cle_data_path 'path_of_your_clean_data_folders' \
         --tgt_data_path 'path_of_your_tgt_data_folders' \
         --output 'name_of_your_output_img_folder'
@@ -146,29 +146,37 @@ python _eval_i2t_dataset.py \
         --img_path '../_output_img/name_of_your_output_img_folder' \
         --output 'name_of_your_output_txt_file' \
 ```
+
 where the generated responses will be stored in `./output_unidiffuser/name_of_your_output_txt_file.txt`. We will use them for pseudo-gradient estimation via RGF-estimator.
 
 - Query-based attacking strategy (via RGF-estimator)
 
 ```
 python _train_adv_img_query.py \
-        --output unidiff_adv_query \
-        --data_path '' \
+        --output unidiff_trans_query \  # queried text will be stored
+        --data_path '../_output_img/unidiffuser_trans' \
         --text_path './output_unidiffuser/name_of_your_output_txt_file.txt' \
         --batch_size 1 \
-        --num_samples 10000 \
-        --steps 8 \
+        --num_samples 1000 \
+        --steps 3 \  # you can modify the perturb budget here
+        --epsilon 3 \
         --sigma 8 \
         --delta 'zero' \
-        --num_query 50 \
+        --num_query 25 \
         --num_sub_query 25 \
         --wandb \
-        --wandb_project_name unidiffuser \
+        --wandb_project_name unidiff \
         --wandb_run_name sigma_8_delta_zero \
 ```
 
 # Evaluation
-We use [`wandb`](https://wandb.ai/site) to dynamically monitor the moving average of the CLIP score (e.g., RN50, ViT-B/32, ViT-L/14, etc.) to evaluate the similarity between (a) the generated response and (b) the predefined targeted text c_tar.
+Here, we use [`wandb`](https://wandb.ai/site) to dynamically monitor the moving average of the CLIP score (e.g., RN50, ViT-B/32, ViT-L/14, etc.) to evaluate the similarity between (a) the generated response (of trans/query images) and (b) the predefined targeted text `c_tar`.
+
+An example shown as below, where the dotted line denotes the moving average of the CLIP score (of image captions) after query:
+![Teaser image](./assets/example.png)
+
+Meanwhile, the image caption after query will be stored and the directory can be specified by `--output`.
+
 
 
 # Bibtex

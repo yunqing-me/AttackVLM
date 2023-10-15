@@ -6,7 +6,7 @@ import numpy as np
 import torch
 import torchvision
 from PIL import Image
-from clip_adv_eval_unidiff_i2t_batch import i2t_image_batch
+from eval_i2t_batch import i2t_image_batch
 import wandb
 
 ### unidiff lib
@@ -83,11 +83,11 @@ if __name__ == "__main__":
     parser.add_argument("--num_samples", default=1, type=int)
     parser.add_argument("--input_res", default=224, type=int)
     parser.add_argument("--alpha", default=1.0, type=float)
-    parser.add_argument("--epsilon", default=8, type=int)
+    parser.add_argument("--epsilon", default=3, type=int)
     parser.add_argument("--steps", default=1, type=int)
     parser.add_argument("--output", default="tmp", type=str)
-    parser.add_argument("--data_path", default="tmp", type=str)
-    parser.add_argument("--text_path", default="tmp", type=str)
+    parser.add_argument("--data_path", default="../_output_img/unidiffuser_adv_5/255", type=str)
+    parser.add_argument("--text_path", default="../_output_text/unidiffuser_adv_5.txt", type=str)
     
     parser.add_argument("--delta", default="normal", type=str)
     parser.add_argument("--save_img", action='store_true')
@@ -166,7 +166,7 @@ if __name__ == "__main__":
     autoencoder = libs.autoencoder.get_model(**config.autoencoder)
     autoencoder.to(device)
 
-    # use clip text coder for attack
+    # use clip text encoder for attack
     clip_img_model_for_unidiff, clip_img_model_preprocess_for_unidiff = clip.load("ViT-B/32", device=device, jit=False)
     
     clip_img_model_rn50,   _ = clip.load("RN50", device=device, jit=False)
@@ -261,7 +261,8 @@ if __name__ == "__main__":
         assert (vit_attack_results_vitl14 == query_attack_results_vitl14).all()
     ## ----------
     
-    run = wandb.init(project=config.wandb_project_name, name=config.wandb_run_name, reinit=True)
+    if config.wandb:
+        run = wandb.init(project=config.wandb_project_name, name=config.wandb_run_name, reinit=True)
     
     for i, (image, label, path) in enumerate(data_loader):
         if batch_size * (i+1) > config.num_samples:
@@ -277,11 +278,34 @@ if __name__ == "__main__":
             delta = torch.randn_like(image, requires_grad=False)
         elif config.delta == 'zero':
             delta = torch.zeros_like(image, requires_grad=False)
+        torch.cuda.empty_cache()
         
+        best_image, best_caption = image, unidiff_text_of_adv_vit[i]
+        better_flag = 0
         for step_idx in range(config.steps):
-            print(f"{i}-th image - {step_idx}-th step")
+            print(f"{i}-th image / {step_idx}-th step")
             # step 1. obtain purturbed images
-            image_repeat           = image.repeat(num_query, 1, 1, 1)  # size = (num_query x batch_size, 3, 224, 224)
+            
+            ##########
+            ##########
+            # image_repeat            = image.repeat(num_query, 1, 1, 1)  # size = (num_query x batch_size, 3, 224, 224)
+            with torch.no_grad():
+                if step_idx == 0:
+                    image_repeat           = image.repeat(num_query, 1, 1, 1)
+                else:
+                    image_repeat      = adv_image_in_current_step.repeat(num_query, 1, 1, 1)             
+
+                    unidiff_text_of_adv_vit_in_current_step = i2t_image_batch(config, nnet, use_caption_decoder, caption_decoder, clip_text_model_for_unidiff, autoencoder,
+                                                                    clip_img_model_for_unidiff, clip_img_model_preprocess_for_unidiff, adv_image_in_current_step)
+                    adv_vit_text_token_in_current_step      = clip.tokenize(unidiff_text_of_adv_vit_in_current_step).to(device)
+                    adv_vit_text_features_in_current_step   = clip_img_model_for_unidiff.encode_text(adv_vit_text_token_in_current_step)
+                    adv_vit_text_features_in_current_step   = adv_vit_text_features_in_current_step / adv_vit_text_features_in_current_step.norm(dim=1, keepdim=True)
+                    adv_vit_text_features_in_current_step   = adv_vit_text_features_in_current_step.detach()                
+                    adv_text_features     = adv_vit_text_features_in_current_step
+                    torch.cuda.empty_cache()
+            ###########
+            ###########
+            
             query_noise            = torch.randn_like(image_repeat).sign() # Rademacher noise
             perturbed_image_repeat = torch.clamp(image_repeat + (sigma * query_noise), 0.0, 255.0)  # size = (num_query x batch_size, 3, 224, 224)
             
@@ -302,21 +326,28 @@ if __name__ == "__main__":
                 perturb_text_features = perturb_text_features / perturb_text_features.norm(dim=1, keepdim=True)
                 perturb_text_features = perturb_text_features.detach()
             
-            coefficient = torch.sum((perturb_text_features - adv_text_features) * tgt_text_features, dim=-1)  # size = (num_query * batch_size)
-            coefficient = coefficient.reshape(num_query, batch_size, 1, 1, 1)
-            query_noise = query_noise.reshape(num_query, batch_size, 3, 224, 224)
+            coefficient     = torch.sum((perturb_text_features - adv_text_features) * tgt_text_features, dim=-1)  # size = (num_query * batch_size)
+            coefficient     = coefficient.reshape(num_query, batch_size, 1, 1, 1)
+            query_noise     = query_noise.reshape(num_query, batch_size, 3, 224, 224)
             pseudo_gradient = coefficient * query_noise / sigma # size = (num_query, batch_size, 3, 224, 224)
             pseudo_gradient = pseudo_gradient.mean(0) # size = (bs, 3, 224, 224)
             
             # step 3. log metrics
             with torch.no_grad():
-                adv_image_in_current_step = image + delta
-                    
+
                 delta_data = torch.clamp(delta + alpha * torch.sign(pseudo_gradient), min=-epsilon, max=epsilon)
                 delta.data = delta_data
-                print(f"img: {i:3d}-step {step_idx} max  delta", torch.max(torch.abs(delta)).item())
-                print(f"img: {i:3d}-step {step_idx} mean delta", torch.mean(torch.abs(delta)).item())
+                adv_image_in_current_step = torch.clamp(image+delta, 0.0, 255.0)
                 
+                print(f"{i}-th img // {step_idx}-th step // max  delta", torch.max(torch.abs(delta)).item())
+                print(f"{i}-th img // {step_idx}-th step // mean delta", torch.mean(torch.abs(delta)).item())
+                
+                # wandb.log(
+                #     {
+                #         "max delta:":  torch.max(torch.abs(delta)).item(),
+                #         "mean delta:": torch.mean(torch.abs(delta)).item()
+                #     }
+                # )
                 unidiff_text_of_adv_image_in_current_step = i2t_image_batch(config, nnet, use_caption_decoder, caption_decoder, clip_text_model_for_unidiff, autoencoder,
                                                                             clip_img_model_for_unidiff, clip_img_model_preprocess_for_unidiff, adv_image_in_current_step)
 
@@ -330,7 +361,10 @@ if __name__ == "__main__":
                 # update results
                 if adv_txt_tgt_txt_score_in_current_step > query_attack_results[i]:
                     query_attack_results[i] = adv_txt_tgt_txt_score_in_current_step
-                
+                    best_image   = adv_image_in_current_step
+                    best_caption = unidiff_text_of_adv_image_in_current_step[0]
+                    better_flag  = 1
+            
                 # other clip archs
                 # rn50
                 tgt_text_features_rn50 = target_text_features_rn50[batch_size * (i): batch_size * (i+1)]
@@ -368,22 +402,35 @@ if __name__ == "__main__":
                 if adv_txt_tgt_txt_score_in_current_step_vitl14 > query_attack_results_vitl14[i]:
                     query_attack_results_vitl14[i] = adv_txt_tgt_txt_score_in_current_step_vitl14
                     # ----------------
+                torch.cuda.empty_cache()
+                
+        # for each image after query
+        if config.wandb:
+            wandb.log(
+                {   
+                    "moving-avg-adv-rn50"    : np.mean(vit_attack_results_rn50[:(i+1)]),
+                    "moving-avg-query-rn50"  : np.mean(query_attack_results_rn50[:(i+1)]),
+                    
+                    "moving-avg-adv-rn101"   : np.mean(vit_attack_results_rn101[:(i+1)]),
+                    "moving-avg-query-rn101" : np.mean(query_attack_results_rn101[:(i+1)]),
+                    
+                    "moving-avg-adv-vitb16"  : np.mean(vit_attack_results_vitb16[:(i+1)]),
+                    "moving-avg-query-vitb16": np.mean(query_attack_results_vitb16[:(i+1)]),
+                    
+                    "moving-avg-adv-vitb32"  : np.mean(vit_attack_results[:(i+1)]),
+                    "moving-avg-query-vitb32": np.mean(query_attack_results[:(i+1)]),
+                    
+                    "moving-avg-adv-vitl14"  : np.mean(vit_attack_results_vitl14[:(i+1)]),
+                    "moving-avg-query-vitl14": np.mean(query_attack_results_vitl14[:(i+1)]),
+                }
+            )
 
-        wandb.log(
-            {   
-                "moving-avg-adv-rn50"    : np.mean(vit_attack_results_rn50[:(i+1)]),
-                "moving-avg-query-rn50"  : np.mean(query_attack_results_rn50[:(i+1)]),
-                
-                "moving-avg-adv-rn101"   : np.mean(vit_attack_results_rn101[:(i+1)]),
-                "moving-avg-query-rn101" : np.mean(query_attack_results_rn101[:(i+1)]),
-                
-                "moving-avg-adv-vitb16"  : np.mean(vit_attack_results_vitb16[:(i+1)]),
-                "moving-avg-query-vitb16": np.mean(query_attack_results_vitb16[:(i+1)]),
-                
-                "moving-avg-adv-vitb32"  : np.mean(vit_attack_results[:(i+1)]),
-                "moving-avg-query-vitb32": np.mean(query_attack_results[:(i+1)]),
-                
-                "moving-avg-adv-vitl14"  : np.mean(vit_attack_results_vitl14[:(i+1)]),
-                "moving-avg-query-vitl14": np.mean(query_attack_results_vitl14[:(i+1)]),
-            }
-        )
+        # log text
+        print("best caption of current image:", best_caption)
+        with open(os.path.join("../_output_text", config.output + '.txt'), 'a') as f:
+            # print(''.join([best_caption]), file=f)
+            if better_flag:
+                f.write(best_caption+'\n')
+            else:
+                f.write(best_caption)
+        f.close()
