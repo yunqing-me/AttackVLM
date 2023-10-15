@@ -1,26 +1,11 @@
 <h1 align='center' style="text-align:center; font-weight:bold; font-size:2.0em;letter-spacing:2.0px;">
                 On Evaluating Adversarial Robustness of </br> Large Vision-Language Models </h1>
-<!-- <p align='center' style="text-align:center;font-size:1.25em;">
-    <a href="https://scholar.google.com/citations?user=kQA0x9UAAAAJ&hl=en" target="_blank" style="text-decoration: none;">Yunqing Zhao<sup>*1</sup></a>&nbsp;,&nbsp;
-    <a href="https://p2333.github.io/" target="_blank" style="text-decoration: none;">Tianyu Pang<sup>*2&#8224</sup></a>&nbsp;,&nbsp;
-    <a href="https://duchao0726.github.io/" target="_blank" style="text-decoration: none;">Chao Du<sup>2&#8224</sup></a>&nbsp;,&nbsp;
-    <a href="https://ml.cs.tsinghua.edu.cn/~xiaoyang/" target="_blank" style="text-decoration: none;">Xiao Yang <sup>3</sup> </a>&nbsp;,&nbsp;
-    <a href="https://zhenxuan00.github.io/" target="_blank" style="text-decoration: none;">Chongxuan Li <sup>4</sup> </a><br/>
-    <a href="https://sites.google.com/site/mancheung0407/" target="_blank" style="text-decoration: none;">Ngai&#8209;Man Cheung<sup>1&#8224</sup></a>&nbsp;,&nbsp; 
-    <a href="https://linmin.me/" target="_blank" style="text-decoration: none;">Min Lin<sup>2</sup></a> &nbsp;&nbsp;&nbsp;&nbsp; </br>
-    <sup>*</sup>Equal Contribution&nbsp;&nbsp;&nbsp;&nbsp;<sup>&#8224</sup>Equal Advice
-    <br/> 
-<sup>1</sup>Singapore University of Technology and Design &nbsp;&nbsp;
-<sup>2</sup>Sea AI Lab (SAIL), Singapore <br/>
-<sup>3</sup>Tsinghua University &nbsp;&nbsp;
-<sup>4</sup>Renmin University of China
-</p> -->
 
-<p align='center' style=font-size:1.2em;>
+<!-- <p align='center' style=font-size:1.2em;>
 <b>
 <em>arXiv-Preprint, 2023</em> <br>
 </b>
-</p>
+</p> -->
 
 <p align='left' style="text-align:left;font-size:1.2em;">
 <b>
@@ -143,7 +128,7 @@ the crafted adv images x_trans will be stored in `../_output_img/name_of_your_ou
 python _eval_i2t_dataset.py \
         --batch_size 10 \
         --mode i2t \
-        --img_path '../_output_img/name_of_your_output_img_folder' \
+        --img_path '../_output_img/name_of_your_trans_img_folder' \
         --output 'name_of_your_output_txt_file' \
 ```
 
