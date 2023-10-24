@@ -280,7 +280,7 @@ if __name__ == "__main__":
             delta = torch.zeros_like(image, requires_grad=False)
         torch.cuda.empty_cache()
         
-        best_image, best_caption = image, unidiff_text_of_adv_vit[i]
+        best_caption = unidiff_text_of_adv_vit[i]
         better_flag = 0
         for step_idx in range(config.steps):
             print(f"{i}-th image / {step_idx}-th step")
@@ -288,7 +288,6 @@ if __name__ == "__main__":
             
             ##########
             ##########
-            # image_repeat            = image.repeat(num_query, 1, 1, 1)  # size = (num_query x batch_size, 3, 224, 224)
             with torch.no_grad():
                 if step_idx == 0:
                     image_repeat           = image.repeat(num_query, 1, 1, 1)
@@ -361,7 +360,6 @@ if __name__ == "__main__":
                 # update results
                 if adv_txt_tgt_txt_score_in_current_step > query_attack_results[i]:
                     query_attack_results[i] = adv_txt_tgt_txt_score_in_current_step
-                    best_image   = adv_image_in_current_step
                     best_caption = unidiff_text_of_adv_image_in_current_step[0]
                     better_flag  = 1
             
@@ -404,7 +402,7 @@ if __name__ == "__main__":
                     # ----------------
                 torch.cuda.empty_cache()
                 
-        # for each image after query
+        # log clip score after query
         if config.wandb:
             wandb.log(
                 {   
@@ -425,10 +423,9 @@ if __name__ == "__main__":
                 }
             )
 
-        # log text
+        # log text after query
         print("best caption of current image:", best_caption)
         with open(os.path.join("../_output_text", config.output + '.txt'), 'a') as f:
-            # print(''.join([best_caption]), file=f)
             if better_flag:
                 f.write(best_caption+'\n')
             else:

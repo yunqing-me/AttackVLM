@@ -145,11 +145,11 @@ if __name__ == "__main__":
     # org text/features
     adv_vit_text_path = args.text_path
     with open(os.path.join(adv_vit_text_path), 'r') as f:
-        unidiff_text_of_adv_vit  = f.readlines()[:args.num_samples] 
+        lavis_text_of_adv_vit  = f.readlines()[:args.num_samples] 
         f.close()
     
     with torch.no_grad():
-        adv_vit_text_token    = clip.tokenize(unidiff_text_of_adv_vit).to(device)
+        adv_vit_text_token    = clip.tokenize(lavis_text_of_adv_vit).to(device)
         adv_vit_text_features = clip_img_model_vitb32.encode_text(adv_vit_text_token)
         adv_vit_text_features = adv_vit_text_features / adv_vit_text_features.norm(dim=1, keepdim=True)
         adv_vit_text_features = adv_vit_text_features.detach()
@@ -219,7 +219,8 @@ if __name__ == "__main__":
         assert (vit_attack_results_vitl14 == query_attack_results_vitl14).all()
     ## ----------
     
-    run = wandb.init(project=args.wandb_project_name, name=args.wandb_run_name, reinit=True)
+    if args.wandb:
+        run = wandb.init(project=args.wandb_project_name, name=args.wandb_run_name, reinit=True)
     
     for i, (image, path) in enumerate(data_loader):
         if batch_size * (i+1) > args.num_samples:
@@ -235,11 +236,25 @@ if __name__ == "__main__":
             delta = torch.randn_like(image, requires_grad=False)
         elif args.delta == 'zero':
             delta = torch.zeros_like(image, requires_grad=False)
+
+        best_caption = lavis_text_of_adv_vit[i]
+        better_flag = 0
         
         for step_idx in range(args.steps):
             print(f"{i}-th image - {step_idx}-th step")
             # step 1. obtain purturbed images
-            image_repeat           = image.repeat(num_query, 1, 1, 1)  # size = (num_query x batch_size, 3, args.input_res, args.input_res)
+            if step_idx == 0:
+                image_repeat      = image.repeat(num_query, 1, 1, 1)  # size = (num_query x batch_size, 3, args.input_res, args.input_res)
+            else:
+                image_repeat      = adv_image_in_current_step.repeat(num_query, 1, 1, 1)             
+
+                lavis_text_of_adv_image_in_current_step = _i2t(args, txt_processors, model, image=adv_image_in_current_step)
+                adv_vit_text_token_in_current_step      = clip.tokenize(lavis_text_of_adv_image_in_current_step).to(device)
+                adv_vit_text_features_in_current_step   = clip_img_model_vitb32.encode_text(adv_vit_text_token_in_current_step)
+                adv_vit_text_features_in_current_step   = adv_vit_text_features_in_current_step / adv_vit_text_features_in_current_step.norm(dim=1, keepdim=True)
+                adv_vit_text_features_in_current_step   = adv_vit_text_features_in_current_step.detach()                
+                adv_text_features     = adv_vit_text_features_in_current_step
+                torch.cuda.empty_cache()
             query_noise            = torch.randn_like(image_repeat).sign() # Rademacher noise
             perturbed_image_repeat = torch.clamp(image_repeat + (sigma * query_noise), 0.0, 255.0)  # size = (num_query x batch_size, 3, args.input_res, args.input_res)
             
@@ -277,28 +292,30 @@ if __name__ == "__main__":
             
             # get adv text
             if args.model_name == 'img2prompt_vqa':
-                unidiff_text_of_adv_image_in_current_step = _i2t(args, txt_processors, model, image=adv_image_in_current_step)
+                lavis_text_of_adv_image_in_current_step = _i2t(args, txt_processors, model, image=adv_image_in_current_step)
             else:
                 with torch.no_grad():
-                    unidiff_text_of_adv_image_in_current_step = _i2t(args, txt_processors, model, image=adv_image_in_current_step)
+                    lavis_text_of_adv_image_in_current_step = _i2t(args, txt_processors, model, image=adv_image_in_current_step)
             
             # log sim
             with torch.no_grad():
-                unidiff_text_token = clip.tokenize(unidiff_text_of_adv_image_in_current_step).to(device)
-                unidiff_text_features_of_adv_image_in_current_step = clip_img_model_vitb32.encode_text(unidiff_text_token)
-                unidiff_text_features_of_adv_image_in_current_step = unidiff_text_features_of_adv_image_in_current_step / unidiff_text_features_of_adv_image_in_current_step.norm(dim=1, keepdim=True)
-                unidiff_text_features_of_adv_image_in_current_step = unidiff_text_features_of_adv_image_in_current_step.detach()
+                lavis_text_token = clip.tokenize(lavis_text_of_adv_image_in_current_step).to(device)
+                lavis_text_features_of_adv_image_in_current_step = clip_img_model_vitb32.encode_text(lavis_text_token)
+                lavis_text_features_of_adv_image_in_current_step = lavis_text_features_of_adv_image_in_current_step / lavis_text_features_of_adv_image_in_current_step.norm(dim=1, keepdim=True)
+                lavis_text_features_of_adv_image_in_current_step = lavis_text_features_of_adv_image_in_current_step.detach()
 
-                adv_txt_tgt_txt_score_in_current_step = torch.mean(torch.sum(unidiff_text_features_of_adv_image_in_current_step * tgt_text_features, dim=1)).item()
+                adv_txt_tgt_txt_score_in_current_step = torch.mean(torch.sum(lavis_text_features_of_adv_image_in_current_step * tgt_text_features, dim=1)).item()
                 
                 # update results
                 if adv_txt_tgt_txt_score_in_current_step > query_attack_results[i]:
                     query_attack_results[i] = adv_txt_tgt_txt_score_in_current_step
-                
+                    best_caption = lavis_text_of_adv_image_in_current_step[0]
+                    better_flag  = 1
+                    
                 # other clip archs
                 # rn50
                 tgt_text_features_rn50 = target_text_features_rn50[batch_size * (i): batch_size * (i+1)]
-                text_features_of_adv_image_in_current_step_rn50 = clip_img_model_rn50.encode_text(unidiff_text_token)
+                text_features_of_adv_image_in_current_step_rn50 = clip_img_model_rn50.encode_text(lavis_text_token)
                 text_features_of_adv_image_in_current_step_rn50 = text_features_of_adv_image_in_current_step_rn50 / text_features_of_adv_image_in_current_step_rn50.norm(dim=1, keepdim=True)
                 text_features_of_adv_image_in_current_step_rn50 = text_features_of_adv_image_in_current_step_rn50.detach()
                 adv_txt_tgt_txt_score_in_current_step_rn50 = torch.mean(torch.sum(text_features_of_adv_image_in_current_step_rn50 * tgt_text_features_rn50, dim=1)).item()
@@ -307,7 +324,7 @@ if __name__ == "__main__":
                 
                 # rn101
                 tgt_text_features_rn101 = target_text_features_rn101[batch_size * (i): batch_size * (i+1)]
-                text_features_of_adv_image_in_current_step_rn101 = clip_img_model_rn101.encode_text(unidiff_text_token)
+                text_features_of_adv_image_in_current_step_rn101 = clip_img_model_rn101.encode_text(lavis_text_token)
                 text_features_of_adv_image_in_current_step_rn101 = text_features_of_adv_image_in_current_step_rn101 / text_features_of_adv_image_in_current_step_rn101.norm(dim=1, keepdim=True)
                 text_features_of_adv_image_in_current_step_rn101 = text_features_of_adv_image_in_current_step_rn101.detach()
                 adv_txt_tgt_txt_score_in_current_step_rn101 = torch.mean(torch.sum(text_features_of_adv_image_in_current_step_rn101 * tgt_text_features_rn101, dim=1)).item()
@@ -316,7 +333,7 @@ if __name__ == "__main__":
                 
                 # vitb16
                 tgt_text_features_vitb16 = target_text_features_vitb16[batch_size * (i): batch_size * (i+1)]
-                text_features_of_adv_image_in_current_step_vitb16 = clip_img_model_vitb16.encode_text(unidiff_text_token)
+                text_features_of_adv_image_in_current_step_vitb16 = clip_img_model_vitb16.encode_text(lavis_text_token)
                 text_features_of_adv_image_in_current_step_vitb16 = text_features_of_adv_image_in_current_step_vitb16 / text_features_of_adv_image_in_current_step_vitb16.norm(dim=1, keepdim=True)
                 text_features_of_adv_image_in_current_step_vitb16 = text_features_of_adv_image_in_current_step_vitb16.detach()
                 adv_txt_tgt_txt_score_in_current_step_vitb16 = torch.mean(torch.sum(text_features_of_adv_image_in_current_step_vitb16 * tgt_text_features_vitb16, dim=1)).item()
@@ -325,29 +342,40 @@ if __name__ == "__main__":
                 
                 # vitl14
                 tgt_text_features_vitl14 = target_text_features_vitl14[batch_size * (i): batch_size * (i+1)]
-                text_features_of_adv_image_in_current_step_vitl14 = clip_img_model_vitl14.encode_text(unidiff_text_token)
+                text_features_of_adv_image_in_current_step_vitl14 = clip_img_model_vitl14.encode_text(lavis_text_token)
                 text_features_of_adv_image_in_current_step_vitl14 = text_features_of_adv_image_in_current_step_vitl14 / text_features_of_adv_image_in_current_step_vitl14.norm(dim=1, keepdim=True)
                 text_features_of_adv_image_in_current_step_vitl14 = text_features_of_adv_image_in_current_step_vitl14.detach()
                 adv_txt_tgt_txt_score_in_current_step_vitl14 = torch.mean(torch.sum(text_features_of_adv_image_in_current_step_vitl14 * tgt_text_features_vitl14, dim=1)).item()
                 if adv_txt_tgt_txt_score_in_current_step_vitl14 > query_attack_results_vitl14[i]:
                     query_attack_results_vitl14[i] = adv_txt_tgt_txt_score_in_current_step_vitl14
                     # ----------------
+                
+        if args.wandb:
+            wandb.log(
+                {   
+                    "moving-avg-adv-rn50"    : np.mean(vit_attack_results_rn50[:(i+1)]),
+                    "moving-avg-query-rn50"  : np.mean(query_attack_results_rn50[:(i+1)]),
+                    
+                    "moving-avg-adv-rn101"   : np.mean(vit_attack_results_rn101[:(i+1)]),
+                    "moving-avg-query-rn101" : np.mean(query_attack_results_rn101[:(i+1)]),
+                    
+                    "moving-avg-adv-vitb16"  : np.mean(vit_attack_results_vitb16[:(i+1)]),
+                    "moving-avg-query-vitb16": np.mean(query_attack_results_vitb16[:(i+1)]),
+                    
+                    "moving-avg-adv-vitb32"  : np.mean(vit_attack_results[:(i+1)]),
+                    "moving-avg-query-vitb32": np.mean(query_attack_results[:(i+1)]),
+                    
+                    "moving-avg-adv-vitl14"  : np.mean(vit_attack_results_vitl14[:(i+1)]),
+                    "moving-avg-query-vitl14": np.mean(query_attack_results_vitl14[:(i+1)]),
+                }
+            )
 
-        wandb.log(
-            {   
-                "moving-avg-adv-rn50"    : np.mean(vit_attack_results_rn50[:(i+1)]),
-                "moving-avg-query-rn50"  : np.mean(query_attack_results_rn50[:(i+1)]),
-                
-                "moving-avg-adv-rn101"   : np.mean(vit_attack_results_rn101[:(i+1)]),
-                "moving-avg-query-rn101" : np.mean(query_attack_results_rn101[:(i+1)]),
-                
-                "moving-avg-adv-vitb16"  : np.mean(vit_attack_results_vitb16[:(i+1)]),
-                "moving-avg-query-vitb16": np.mean(query_attack_results_vitb16[:(i+1)]),
-                
-                "moving-avg-adv-vitb32"  : np.mean(vit_attack_results[:(i+1)]),
-                "moving-avg-query-vitb32": np.mean(query_attack_results[:(i+1)]),
-                
-                "moving-avg-adv-vitl14"  : np.mean(vit_attack_results_vitl14[:(i+1)]),
-                "moving-avg-query-vitl14": np.mean(query_attack_results_vitl14[:(i+1)]),
-            }
-        )
+        # log text
+        print("best caption of current image:", best_caption)
+        with open(os.path.join("../_output_text", args.output + '.txt'), 'a') as f:
+            # print(''.join([best_caption]), file=f)
+            if better_flag:
+                f.write(best_caption+'\n')
+            else:
+                f.write(best_caption)
+        f.close()
