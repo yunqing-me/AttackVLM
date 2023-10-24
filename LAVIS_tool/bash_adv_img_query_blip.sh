@@ -2,7 +2,9 @@
 
 
 python _train_adv_img_query.py \
+    --data_path '../_output_text/blip_trans' \
     --text_path '../_output_text/blip_trans.txt' \
+    --output_path 'blip_trans_query' \
     --model_name blip_caption \
     --model_type base_coco \
     --batch_size 1 \

@@ -100,8 +100,8 @@ if __name__ == "__main__":
     parser.add_argument("--epsilon", default=8, type=int)
     parser.add_argument("--steps", default=1, type=int)
     parser.add_argument("--output", default="tmp", type=str)
-    parser.add_argument("--data_path", default="../_output_img/blip_1_adv", type=str)
-    parser.add_argument("--text_path", default="../_output_text/blip_1_adv_pred.txt", type=str)
+    parser.add_argument("--data_path", default="../_output_img/blip_trans", type=str)
+    parser.add_argument("--text_path", default="../_output_text/blip_trans.txt", type=str)
     
     parser.add_argument("--delta", default="normal", type=str)
     parser.add_argument("--num_query", default=20, type=int)
