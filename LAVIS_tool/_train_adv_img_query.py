@@ -42,27 +42,44 @@ def to_tensor(pic):
     img = img.permute((2, 0, 1)).contiguous()
     return img.to(dtype=torch.get_default_dtype())
 
-transform = torchvision.transforms.Compose(
-    [
+
+# to replace vis_processor
+transform_a = torchvision.transforms.Compose(
+    [   
         torchvision.transforms.Lambda(lambda img: img.convert("RGB")),
+        torchvision.transforms.Resize(size=(384, 384), interpolation=torchvision.transforms.InterpolationMode.BICUBIC, max_size=None, antialias='warn'),
         torchvision.transforms.Lambda(lambda img: to_tensor(img)),
+        # torchvision.transforms.ToTensor(),
+    ]
+)
+transform_b = torchvision.transforms.Compose(
+    [   
+        torchvision.transforms.Lambda(lambda img: img.convert("RGB")),
+        torchvision.transforms.Resize(size=(224, 224), interpolation=torchvision.transforms.InterpolationMode.BICUBIC, max_size=None, antialias='warn'),
+        torchvision.transforms.Lambda(lambda img: to_tensor(img)),
+        # torchvision.transforms.ToTensor(),
+    ]
+)
+normalize = torchvision.transforms.Compose(
+    [   
+        # torchvision.transforms.ToTensor(),
+        torchvision.transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))
     ]
 )
 
-class ImageFolderForLavis(torchvision.datasets.ImageFolder):
-    def __init__(self, root, processor, transform = None, target_transform = None, loader = ..., is_valid_file = None):
-        super().__init__(root, transform, target_transform, loader, is_valid_file)
-        self.processor = processor
-        
+
+class ImageFolderWithPaths(torchvision.datasets.ImageFolder):
     def __getitem__(self, index: int):
-        
-        # original_tuple = super().__getitem__(index)
+        original_tuple = super().__getitem__(index)
         path, _ = self.samples[index]
-        image   = self.processor["eval"](Image.open(path).convert('RGB'))
-        
-        return (image, path)
+        return original_tuple + (path,)
+
 
 def _i2t(args, txt_processors, model, image):
+    
+    # normalize image here
+    image = normalize(image / 255.0)
+    
     # generate caption
     if args.model_name == "img2prompt_vqa":
         question = "what is the content of this image?"
@@ -100,8 +117,8 @@ if __name__ == "__main__":
     parser.add_argument("--epsilon", default=8, type=int)
     parser.add_argument("--steps", default=1, type=int)
     parser.add_argument("--output", default="tmp", type=str)
-    parser.add_argument("--data_path", default="../_output_img/blip_trans", type=str)
-    parser.add_argument("--text_path", default="../_output_text/blip_trans.txt", type=str)
+    parser.add_argument("--data_path", default="../_output_img/blip_1_adv", type=str)
+    parser.add_argument("--text_path", default="../_output_text/blip_1_adv_pred.txt", type=str)
     
     parser.add_argument("--delta", default="normal", type=str)
     parser.add_argument("--num_query", default=20, type=int)
@@ -133,15 +150,23 @@ if __name__ == "__main__":
     batch_size    = args.batch_size
     alpha         = args.alpha
     epsilon       = args.epsilon
-    if args.model_name == 'blip_caption':
-        args.input_res = 384
-    elif args.model_name == 'blip2_opt':
+    
+    if args.model_name == 'blip2_opt':
         args.input_res = 224
     else:
         args.input_res = 384
-    vit_adv_data  = ImageFolderForLavis(args.data_path, processor=vis_processors, transform=None)
-    data_loader   = torch.utils.data.DataLoader(vit_adv_data, batch_size=batch_size, shuffle=False, num_workers=24)
+
+    if args.input_res == 384:
+        vit_adv_data  = ImageFolderWithPaths(args.data_path, transform=transform_a)
+        clean_data    = ImageFolderWithPaths("/raid/common/imagenet-raw/val/", transform=transform_a)
     
+    else:
+        vit_adv_data  = ImageFolderWithPaths(args.data_path, transform=transform_b)
+        clean_data    = ImageFolderWithPaths("/raid/common/imagenet-raw/val/", transform=transform_b)
+        
+    data_loader       = torch.utils.data.DataLoader(vit_adv_data, batch_size=batch_size, shuffle=False, num_workers=24)
+    clean_data_loader = torch.utils.data.DataLoader(clean_data, batch_size=batch_size, shuffle=False, num_workers=24)
+        
     # org text/features
     adv_vit_text_path = args.text_path
     with open(os.path.join(adv_vit_text_path), 'r') as f:
@@ -155,7 +180,7 @@ if __name__ == "__main__":
         adv_vit_text_features = adv_vit_text_features.detach()
     
     # tgt text/features
-    tgt_text_path = '../_output_text/_coco_captions_10000.txt'
+    tgt_text_path = './_coco_captions_10000.txt'
     with open(os.path.join(tgt_text_path), 'r') as f:
         tgt_text  = f.readlines()[:args.num_samples] 
         f.close()
@@ -222,21 +247,21 @@ if __name__ == "__main__":
     if args.wandb:
         run = wandb.init(project=args.wandb_project_name, name=args.wandb_run_name, reinit=True)
     
-    for i, (image, path) in enumerate(data_loader):
+    for i, ((image, _, path), (image_clean, _, _)) in enumerate(zip(data_loader, clean_data_loader)):
         if batch_size * (i+1) > args.num_samples:
             break
-        image = image.to(device)  # size=(10, 3, args.input_res, args.input_res)
+        image = image.to(device)  # size=(10, 3, 224, 224)
+        image_clean = image_clean.to(device)  # size=(10, 3, 224, 224)
         
         # obtain all text features (via CLIP text encoder)
         adv_text_features = adv_vit_text_features[batch_size * (i): batch_size * (i+1)]        
         tgt_text_features = target_text_features[batch_size * (i): batch_size * (i+1)]
         
         # ------------------- random gradient-free method
-        if args.delta == 'normal':
-            delta = torch.randn_like(image, requires_grad=False)
-        elif args.delta == 'zero':
-            delta = torch.zeros_like(image, requires_grad=False)
-
+        print("init delta with diff(adv-clean)")
+        delta = torch.tensor((image - image_clean))
+        torch.cuda.empty_cache()
+        
         best_caption = lavis_text_of_adv_vit[i]
         better_flag = 0
         
@@ -283,12 +308,12 @@ if __name__ == "__main__":
             pseudo_gradient = pseudo_gradient.mean(0) # size = (bs, 3, args.input_res, args.input_res)
             
             # step 3. log metrics
-            adv_image_in_current_step = image + delta
-                
             delta_data = torch.clamp(delta + alpha * torch.sign(pseudo_gradient), min=-epsilon, max=epsilon)
             delta.data = delta_data
             print(f"img: {i:3d}-step {step_idx} max  delta", torch.max(torch.abs(delta)).item())
             print(f"img: {i:3d}-step {step_idx} mean delta", torch.mean(torch.abs(delta)).item())
+            
+            adv_image_in_current_step = torch.clamp(image_clean+delta, 0.0, 255.0)
             
             # get adv text
             if args.model_name == 'img2prompt_vqa':
@@ -350,6 +375,7 @@ if __name__ == "__main__":
                     query_attack_results_vitl14[i] = adv_txt_tgt_txt_score_in_current_step_vitl14
                     # ----------------
                 
+
         if args.wandb:
             wandb.log(
                 {   
@@ -372,7 +398,7 @@ if __name__ == "__main__":
 
         # log text
         print("best caption of current image:", best_caption)
-        with open(os.path.join("../_output_text", args.output + '.txt'), 'a') as f:
+        with open(os.path.join(args.output + '.txt'), 'a') as f:
             # print(''.join([best_caption]), file=f)
             if better_flag:
                 f.write(best_caption+'\n')

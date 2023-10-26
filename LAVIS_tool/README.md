@@ -21,41 +21,49 @@ Here, we use BLIP for an example. For other models supported in the LAVIS librar
 ### Transfer-based attacking strategy
 
 ```
-bash adv_img_transfer_blip.sh
+python _train_adv_img_blip.py  \
+    --batch_size 25 \
+    --num_samples 1000 \
+    --steps 100 \
+    --output 'dir of white-box transfer images' \
+    --model_name blip_caption \
+    --model_type base_coco
 ```
-the crafted adv images x_trans will be stored in `../_output_img/name_of_your_output_img_folder`. Then, we perform image-to-text and store the generated response of x_trans. This can be achieved by:
+the crafted adv images x_trans will be stored in `dir of white-box transfer images`. For other models like `BLIP2`, see `bash adv_img_transfer_blip.sh`. Then, we perform image-to-text and store the generated response of x_trans. This can be achieved by:
 
 ```
-bash img2txt_blip.sh
+python _lavis_img2txt.py  \
+    --batch_size 50 \
+    --num_samples 1000 \
+    --img_path 'dir of white-box transfer images' \
+    --output_path 'name (.txt) of white-box transfer captions' \
+    --model_name "blip_caption" \
+    --model_type "base_coco"
 ```
-where the generated responses will be stored in `./output_unidiffuser/name_of_your_output_txt_file.txt`. We will use them for pseudo-gradient estimation via RGF-estimator.
+
+where the generated responses will be stored in `name (.txt) of white-box transfer captions`. For other models like `BLIP2`, see `bash_img2txt_blip.sh`.
+We will use them for pseudo-gradient estimation via RGF-estimator. 
 
 ### Query-based attacking strategy (via RGF-estimator)
 
+We use `BLIP` as an example script, refer to the following:
 ```
-bash adv_img_query_blip.sh
+python _train_adv_img_query.py \
+    --data_path 'dir of white-box transfer images' \
+    --text_path 'name (.txt) of white-box transfer captions' \
+    --output_path 'dir/name of queried captions' \
+    --model_name blip_caption \
+    --model_type base_coco \
+    --batch_size 1 \
+    --num_samples 1000 \
+    --steps 8 \
+    --sigma 8 \
+    --delta 'zero' \
+    --num_query 100 \
+    --num_sub_query 50 \
+    --wandb \
+    --wandb_project_name lavis \
+    --wandb_run_name blip
 ```
 
-
-
-# Bibtex
-If you find this project useful in your research, please consider citing our paper:
-
-```
-@article{zhao2023evaluate,
-  title={On Evaluating Adversarial Robustness of Large Vision-Language Models},
-  author={Zhao, Yunqing and Pang, Tianyu and Du, Chao and Yang, Xiao and Li, Chongxuan and Cheung, Ngai-Man and Lin, Min},
-  journal={arXiv preprint arXiv:2305.16934},
-  year={2023}
-}
-```
-
-Meanwhile, a relevant research that aims to [Embedding a Watermark to (multi-modal) Diffusion Models](https://github.com/yunqing-me/WatermarkDM):
-```
-@article{zhao2023recipe,
-  title={A Recipe for Watermarking Diffusion Models},
-  author={Zhao, Yunqing and Pang, Tianyu and Du, Chao and Yang, Xiao and Cheung, Ngai-Man and Lin, Min},
-  journal={arXiv preprint arXiv:2303.10137},
-  year={2023}
-}
-```
+Note that this is for fixed perturbation budget (e.g., 8 px) of `MF-ii+MF-tt`. If you plan to assign more budget, please modify the corresponding hyper-parameters accordingly (also see other models in `bash_adv_img_query.sh`).
