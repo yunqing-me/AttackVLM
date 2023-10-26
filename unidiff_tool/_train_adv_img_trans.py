@@ -57,7 +57,7 @@ if __name__ == "__main__":
     parser.add_argument("--alpha", default=1.0, type=float)
     parser.add_argument("--epsilon", default=8, type=int)
     parser.add_argument("--steps", default=300, type=int)
-    parser.add_argument("--output", default="tmp", type=str, help='the folder name of output')
+    parser.add_argument("--output", default="temp", type=str, help='the folder name of output')
     
     parser.add_argument("--cle_data_path", default=None, type=str, help='path of the clean images')
     parser.add_argument("--tgt_data_path", default=None, type=str, help='path of the target images')
@@ -133,7 +133,7 @@ if __name__ == "__main__":
         adv_image = torch.clamp(adv_image / 255.0, 0.0, 1.0)
         for path_idx in range(len(path)):
             folder, name = path[path_idx].split("/")[-2], path[path_idx].split("/")[-1]
-            folder_to_save = os.path.join('../_output_img', args.output, folder)
+            folder_to_save = os.path.join(args.output, folder)
             if not os.path.exists(folder_to_save):
                 os.makedirs(folder_to_save, exist_ok=True)
             if 'JPEG' in name:

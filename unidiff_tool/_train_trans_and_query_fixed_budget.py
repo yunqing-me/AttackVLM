@@ -21,7 +21,7 @@ import libs.clip
 # credit: https://www.kaggle.com/code/rhythmcam/random-seed-everything
 DEFAULT_RANDOM_SEED = 2023
 device = "cuda" if torch.cuda.is_available() else "cpu"
-
+print("use device:", device)
 # basic random seed
 def seedBasic(seed=DEFAULT_RANDOM_SEED):
     random.seed(seed)
@@ -83,21 +83,21 @@ if __name__ == "__main__":
     parser.add_argument("--num_samples", default=1, type=int)
     parser.add_argument("--input_res", default=224, type=int)
     parser.add_argument("--alpha", default=1.0, type=float)
-    parser.add_argument("--epsilon", default=3, type=int)
-    parser.add_argument("--steps", default=1, type=int)
-    parser.add_argument("--output", default="tmp", type=str)
-    parser.add_argument("--data_path", default="../_output_img/unidiffuser_adv_5/255", type=str)
-    parser.add_argument("--text_path", default="../_output_text/unidiffuser_adv_5.txt", type=str)
+    parser.add_argument("--epsilon", default=8, type=int)
+    parser.add_argument("--steps", default=8, type=int)
+    parser.add_argument("--output", default="temp", type=str)
+    parser.add_argument("--data_path", default="temp", type=str)
+    parser.add_argument("--text_path", default="temp", type=str)
     
     parser.add_argument("--delta", default="normal", type=str)
     parser.add_argument("--save_img", action='store_true')
-    parser.add_argument("--num_query", default=20, type=int)
+    parser.add_argument("--num_query", default=5, type=int)
     parser.add_argument("--num_sub_query", default=5, type=int)
     parser.add_argument("--sigma", default=16, type=float)
     
     parser.add_argument("--wandb", action="store_true")
-    parser.add_argument("--wandb_project_name", type=str, default='tmp_proj')
-    parser.add_argument("--wandb_run_name", type=str, default='tmp_run')
+    parser.add_argument("--wandb_project_name", type=str, default='temp_proj')
+    parser.add_argument("--wandb_run_name", type=str, default='temp_run')
     
     config = parser.parse_args()
 
@@ -183,6 +183,10 @@ if __name__ == "__main__":
     epsilon       = config.epsilon
     vit_adv_data  = ImageFolderWithPaths(config.data_path, transform=transform)
     data_loader   = torch.utils.data.DataLoader(vit_adv_data, batch_size=batch_size, shuffle=False, num_workers=24)
+
+    # clean img, same size as clip img encoder
+    clean_data    = ImageFolderWithPaths("../imagenet_resized_224", transform=transform)
+    clean_data_loader = torch.utils.data.DataLoader(clean_data, batch_size=batch_size, shuffle=False, num_workers=24)
     
     # org text/features
     adv_vit_text_path = config.text_path
@@ -197,7 +201,7 @@ if __name__ == "__main__":
         adv_vit_text_features = adv_vit_text_features.detach()
     
     # tgt text/features
-    tgt_text_path = '../_output_text/_coco_captions_10000.txt'
+    tgt_text_path = './_coco_captions_10000.txt'
     with open(os.path.join(tgt_text_path), 'r') as f:
         tgt_text  = f.readlines()[:config.num_samples] 
         f.close()
@@ -264,20 +268,18 @@ if __name__ == "__main__":
     if config.wandb:
         run = wandb.init(project=config.wandb_project_name, name=config.wandb_run_name, reinit=True)
     
-    for i, (image, label, path) in enumerate(data_loader):
+    for i, ((image, _, path), (image_clean, _, _)) in enumerate(zip(data_loader, clean_data_loader)):
         if batch_size * (i+1) > config.num_samples:
             break
         image = image.to(device)  # size=(10, 3, 224, 224)
-        
+        image_clean = image_clean.to(device)  # size=(10, 3, 224, 224)
         # obtain all text features (via CLIP text encoder)
         adv_text_features = adv_vit_text_features[batch_size * (i): batch_size * (i+1)]        
         tgt_text_features = target_text_features[batch_size * (i): batch_size * (i+1)]
         
         # ------------------- random gradient-free method
-        if config.delta == 'normal':
-            delta = torch.randn_like(image, requires_grad=False)
-        elif config.delta == 'zero':
-            delta = torch.zeros_like(image, requires_grad=False)
+        print("init delta with diff(adv-clean)")
+        delta = torch.tensor((image - image_clean))
         torch.cuda.empty_cache()
         
         best_caption = unidiff_text_of_adv_vit[i]
@@ -290,7 +292,7 @@ if __name__ == "__main__":
             ##########
             with torch.no_grad():
                 if step_idx == 0:
-                    image_repeat           = image.repeat(num_query, 1, 1, 1)
+                    image_repeat      = image.repeat(num_query, 1, 1, 1)
                 else:
                     image_repeat      = adv_image_in_current_step.repeat(num_query, 1, 1, 1)             
 
@@ -315,7 +317,7 @@ if __name__ == "__main__":
                 with torch.no_grad():
                     text_of_sub_perturbed_imgs = i2t_image_batch(config, nnet, use_caption_decoder, caption_decoder, clip_text_model_for_unidiff, autoencoder,
                                                                  clip_img_model_for_unidiff, clip_img_model_preprocess_for_unidiff,
-                                                                 sub_perturbed_image_repeat)  # a list with length num_sub_query
+                                                                 sub_perturbed_image_repeat)
                 text_of_perturbed_imgs.extend(text_of_sub_perturbed_imgs)
             
             # step 2. estimate grad
@@ -325,18 +327,18 @@ if __name__ == "__main__":
                 perturb_text_features = perturb_text_features / perturb_text_features.norm(dim=1, keepdim=True)
                 perturb_text_features = perturb_text_features.detach()
             
-            coefficient     = torch.sum((perturb_text_features - adv_text_features) * tgt_text_features, dim=-1)  # size = (num_query * batch_size)
+            coefficient     = torch.sum((perturb_text_features - adv_text_features) * tgt_text_features, dim=-1)
             coefficient     = coefficient.reshape(num_query, batch_size, 1, 1, 1)
             query_noise     = query_noise.reshape(num_query, batch_size, 3, 224, 224)
-            pseudo_gradient = coefficient * query_noise / sigma # size = (num_query, batch_size, 3, 224, 224)
-            pseudo_gradient = pseudo_gradient.mean(0) # size = (bs, 3, 224, 224)
+            pseudo_gradient = coefficient * query_noise / sigma
+            pseudo_gradient = pseudo_gradient.mean(0)
             
             # step 3. log metrics
             with torch.no_grad():
 
                 delta_data = torch.clamp(delta + alpha * torch.sign(pseudo_gradient), min=-epsilon, max=epsilon)
                 delta.data = delta_data
-                adv_image_in_current_step = torch.clamp(image+delta, 0.0, 255.0)
+                adv_image_in_current_step = torch.clamp(image_clean+delta, 0.0, 255.0)
                 
                 print(f"{i}-th img // {step_idx}-th step // max  delta", torch.max(torch.abs(delta)).item())
                 print(f"{i}-th img // {step_idx}-th step // mean delta", torch.mean(torch.abs(delta)).item())
@@ -425,7 +427,7 @@ if __name__ == "__main__":
 
         # log text after query
         print("best caption of current image:", best_caption)
-        with open(os.path.join("../_output_text", config.output + '.txt'), 'a') as f:
+        with open(os.path.join(config.output + '.txt'), 'a') as f:
             if better_flag:
                 f.write(best_caption+'\n')
             else:

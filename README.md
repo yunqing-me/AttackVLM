@@ -112,46 +112,30 @@ then, create a suitable conda environment named `unidiffuser` following the step
 ```
 conda activate unidiffuser
 
-python _train_adv_img.py \
-        --output unidiff_adv_transfer \
-        --batch_size 250 \
-        --num_samples 10000 \
-        --steps 100 \
-        --epsilon 5 \  # you can modify the perturb budget here
-        --cle_data_path 'path_of_your_clean_data_folders' \
-        --tgt_data_path 'path_of_your_tgt_data_folders' \
-        --output 'name_of_your_output_img_folder'
+bash _train_adv_img_trans.sh
 ```
-the crafted adv images x_trans will be stored in `../_output_img/name_of_your_output_img_folder`. Then, we perform image-to-text and store the generated response of x_trans. This can be achieved by:
+the crafted adv images x_trans will be stored in `dir of white-box transfer images` specified in `--output`. Then, we perform image-to-text and store the generated response of x_trans. This can be achieved by:
 
 ```
 python _eval_i2t_dataset.py \
-        --batch_size 10 \
+        --batch_size 100 \
         --mode i2t \
-        --img_path '../_output_img/name_of_your_trans_img_folder' \
-        --output 'name_of_your_output_txt_file' \
+        --img_path 'dir of white-box transfer images' \
+        --output 'dir of white-box transfer captions' \
 ```
 
-where the generated responses will be stored in `./output_unidiffuser/name_of_your_output_txt_file.txt`. We will use them for pseudo-gradient estimation via RGF-estimator.
+where the generated responses will be stored in `dir of white-box transfer captions` in `.txt` format. We will use them for pseudo-gradient estimation via RGF-estimator.
 
-- Query-based attacking strategy (via RGF-estimator)
+- Query-based attacking strategy (via RGF-estimator): assume we use **fixed perturbation budget** for `MF-ii + MF-tt` (e.g., 8 px)
 
 ```
-python _train_adv_img_query.py \
-        --output unidiff_trans_query \  # queried text will be stored
-        --data_path '../_output_img/unidiffuser_trans' \
-        --text_path './output_unidiffuser/name_of_your_output_txt_file.txt' \
-        --batch_size 1 \
-        --num_samples 1000 \
-        --steps 3 \  # you can modify the perturb budget here
-        --epsilon 3 \
-        --sigma 8 \
-        --delta 'zero' \
-        --num_query 25 \
-        --num_sub_query 25 \
-        --wandb \
-        --wandb_project_name unidiff \
-        --wandb_run_name sigma_8_delta_zero \
+bash _train_trans_and_query_fixed_budget.sh
+```
+
+On the other hand, if you want to conduct transfer+query - based attack with **more perturbation budget**, we additionally provide a script:
+
+```
+bash _train_trans_and_query_more_budget.sh
 ```
 
 # Evaluation
