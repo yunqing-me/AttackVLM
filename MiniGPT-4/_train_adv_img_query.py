@@ -54,21 +54,30 @@ def to_tensor(pic):
     return img.to(dtype=torch.get_default_dtype())
 
 transform = torchvision.transforms.Compose(
-    [
+    [   
         torchvision.transforms.Lambda(lambda img: img.convert("RGB")),
+        torchvision.transforms.Resize(size=(224, 224), interpolation=torchvision.transforms.InterpolationMode.BICUBIC, max_size=None, antialias='warn'),
         torchvision.transforms.Lambda(lambda img: to_tensor(img)),
+        # torchvision.transforms.ToTensor(),
+    ]
+)
+normalize = torchvision.transforms.Compose(
+    [   
+        # torchvision.transforms.ToTensor(),
+        torchvision.transforms.Normalize((0.48145466, 0.4578275, 0.40821073), (0.26862954, 0.26130258, 0.27577711))
     ]
 )
 
 class ImageFolderWithPaths(torchvision.datasets.ImageFolder):
     def __getitem__(self, index: int):
-        original_tuple = super().__getitem__(index)  # (img, label)
-        path, _ = self.samples[index]  # path: str
-
-        image_processed = vis_processor(original_tuple[0])
-        return image_processed, original_tuple[1], path
-
+        original_tuple = super().__getitem__(index)
+        path, _ = self.samples[index]
+        return original_tuple + (path,)
+    
 def _i2t(args, chat, image_tensor):
+    
+    # normalize image here
+    image_tensor = normalize(image_tensor / 255.0)
     
     img_list   = chat.get_img_list(image_tensor, img_list=[])  # img embeddings, size() = [bs, 32, 5120]
     mixed_embs = chat.get_mixed_embs(args, img_list=img_list, caption_size=image_tensor.size()[0])
@@ -97,9 +106,9 @@ if __name__ == "__main__":
     parser.add_argument("--alpha", default=1.0, type=float)
     parser.add_argument("--epsilon", default=8, type=int)
     parser.add_argument("--steps", default=1, type=int)
-    parser.add_argument("--output", default="tmp", type=str)
-    parser.add_argument("--data_path", default="../_output_img/minigpt4_adv", type=str)
-    parser.add_argument("--text_path", default="../_output_text/minigpt4_adv_pred.txt", type=str)
+    parser.add_argument("--output", default="temp", type=str)
+    parser.add_argument("--data_path", default="temp", type=str)
+    parser.add_argument("--text_path", default="temp.txt", type=str)
     
     parser.add_argument("--delta", default="normal", type=str)
     parser.add_argument("--num_query", default=20, type=int)
@@ -107,8 +116,8 @@ if __name__ == "__main__":
     parser.add_argument("--sigma", default=8, type=float)
     
     parser.add_argument("--wandb", action="store_true")
-    parser.add_argument("--wandb_project_name", type=str, default='tmp_proj')
-    parser.add_argument("--wandb_run_name", type=str, default='tmp_run')
+    parser.add_argument("--wandb_project_name", type=str, default='temp_proj')
+    parser.add_argument("--wandb_run_name", type=str, default='temp_run')
     
     args = parser.parse_args()
 
@@ -141,10 +150,14 @@ if __name__ == "__main__":
     alpha         = args.alpha
     epsilon       = args.epsilon
 
-    # load image
-    adv_vit_data = ImageFolderWithPaths(args.data_path, transform=None)
-    dataloader    = torch.utils.data.DataLoader(adv_vit_data, batch_size=batch_size, shuffle=False, num_workers=24)
+    # load adv image
+    adv_vit_data      = ImageFolderWithPaths(args.data_path, transform=transform)
+    data_loader       = torch.utils.data.DataLoader(adv_vit_data, batch_size=batch_size, shuffle=False, num_workers=24)
 
+    # load clean image
+    clean_data        = ImageFolderWithPaths("path to imagenet-val", transform=transform)
+    clean_data_loader = torch.utils.data.DataLoader(clean_data, batch_size=batch_size, shuffle=False, num_workers=24)
+    
     chat = Chat(model, vis_processor, device='cuda:{}'.format(args.gpu_id))     
     
     # org text/features
@@ -160,7 +173,7 @@ if __name__ == "__main__":
         adv_vit_text_features = adv_vit_text_features.detach()
     
     # tgt text/features
-    tgt_text_path = '../_output_text/_coco_captions_10000.txt'
+    tgt_text_path = 'path to _coco_captions_10000.txt'
     with open(os.path.join(tgt_text_path), 'r') as f:
         tgt_text  = f.readlines()[:args.num_samples] 
         f.close()
@@ -227,24 +240,40 @@ if __name__ == "__main__":
     if args.wandb:
         run = wandb.init(project=args.wandb_project_name, name=args.wandb_run_name, reinit=True)
     
-    for i, (image, _, path) in enumerate(dataloader):
+    for i, ((image, _, path), (image_clean, _, _)) in enumerate(zip(data_loader, clean_data_loader)):
         if batch_size * (i+1) > args.num_samples:
             break
         image = image.to(device)  # size=(10, 3, args.input_res, args.input_res)
+        image_clean = image_clean.to(device)  # size=(10, 3, 224, 224)
+        
         # obtain all text features (via CLIP text encoder)
         adv_text_features = adv_vit_text_features[batch_size * (i): batch_size * (i+1)]        
         tgt_text_features = target_text_features[batch_size * (i): batch_size * (i+1)]
         
         # ------------------- random gradient-free method
-        if args.delta == 'normal':
-            delta = torch.randn_like(image, requires_grad=False)
-        elif args.delta == 'zero':
-            delta = torch.zeros_like(image, requires_grad=False)
+        print("init delta with diff(adv-clean)")
+        delta = torch.tensor((image - image_clean))
+        torch.cuda.empty_cache()
+        
+        best_caption = adv_vit_text[i]
+        better_flag = 0
         
         for step_idx in range(args.steps):
             print(f"{i}-th image - {step_idx}-th step")
             # step 1. obtain purturbed images
-            image_repeat           = image.repeat(num_query, 1, 1, 1)  # size = (num_query x batch_size, 3, args.input_res, args.input_res)
+            if step_idx == 0:
+                image_repeat      = image.repeat(num_query, 1, 1, 1)  # size = (num_query x batch_size, 3, args.input_res, args.input_res)
+            else:
+                image_repeat      = adv_image_in_current_step.repeat(num_query, 1, 1, 1)             
+
+                text_of_adv_image_in_current_step       = _i2t(args, chat, image_tensor=adv_image_in_current_step)
+                adv_vit_text_token_in_current_step      = clip.tokenize(text_of_adv_image_in_current_step).to(device)
+                adv_vit_text_features_in_current_step   = clip_img_model_vitb32.encode_text(adv_vit_text_token_in_current_step)
+                adv_vit_text_features_in_current_step   = adv_vit_text_features_in_current_step / adv_vit_text_features_in_current_step.norm(dim=1, keepdim=True)
+                adv_vit_text_features_in_current_step   = adv_vit_text_features_in_current_step.detach()                
+                adv_text_features     = adv_vit_text_features_in_current_step
+                torch.cuda.empty_cache()
+                
             query_noise            = torch.randn_like(image_repeat).sign() # Rademacher noise
             perturbed_image_repeat = torch.clamp(image_repeat + (sigma * query_noise), 0.0, 255.0)  # size = (num_query x batch_size, 3, args.input_res, args.input_res)
             
@@ -275,12 +304,12 @@ if __name__ == "__main__":
             pseudo_gradient = pseudo_gradient.mean(0) # size = (bs, 3, args.input_res, args.input_res)
             
             # step 3. log metrics
-            adv_image_in_current_step = (image + delta)
-                
             delta_data = torch.clamp(delta + alpha * torch.sign(pseudo_gradient), min=-epsilon, max=epsilon)
             delta.data = delta_data
             print(f"img: {i:3d}-step {step_idx} max  delta", torch.max(torch.abs(delta)).item())
             print(f"img: {i:3d}-step {step_idx} mean delta", torch.mean(torch.abs(delta)).item())
+            
+            adv_image_in_current_step = torch.clamp(image_clean + delta, 0.0, 255.0)
             
             # log sim
             with torch.no_grad():
@@ -295,7 +324,9 @@ if __name__ == "__main__":
                 # update results
                 if adv_txt_tgt_txt_score_in_current_step > query_attack_results[i]:
                     query_attack_results[i] = adv_txt_tgt_txt_score_in_current_step
-                
+                    best_caption = text_of_adv_image_in_current_step[0]
+                    better_flag  = 1
+                    
                 # other clip archs
                 # rn50
                 tgt_text_features_rn50 = target_text_features_rn50[batch_size * (i): batch_size * (i+1)]
@@ -333,21 +364,6 @@ if __name__ == "__main__":
                 if adv_txt_tgt_txt_score_in_current_step_vitl14 > query_attack_results_vitl14[i]:
                     query_attack_results_vitl14[i] = adv_txt_tgt_txt_score_in_current_step_vitl14
                     # ----------------
-                
-            # # log text
-            # with open(os.path.join("../_output_text", args.output + '_pred.txt'), 'a') as f:
-            #     print('\n'.join(text_of_adv_image_in_current_step), file=f)
-            # f.close()
-            
-            # # save img
-            # os.makedirs(os.path.join('../_output_img', args.output), exist_ok=True)
-            # adv_image_to_save = torch.clamp((adv_image_in_current_step) / 255.0, 0.0, 1.0)
-            # for path_idx in range(len(path)):
-            #     folder, name = path[path_idx].split("/")[-2], path[path_idx].split("/")[-1]
-            #     folder_to_save = os.path.join('../_output_img', args.output, folder)
-            #     if not os.path.exists(folder_to_save):
-            #         os.makedirs(folder_to_save, exist_ok=True)
-            #     torchvision.utils.save_image(adv_image_to_save[path_idx], os.path.join(folder_to_save, name[:-3] + ".png"))
 
         if args.wandb:
             wandb.log(
@@ -368,3 +384,13 @@ if __name__ == "__main__":
                     "moving-avg-query-vitl14": np.mean(query_attack_results_vitl14[:(i+1)]),
                 }
             )
+
+        # log text
+        print("best caption of current image:", best_caption)
+        with open(os.path.join(args.output + '.txt'), 'a') as f:
+            # print(''.join([best_caption]), file=f)
+            if better_flag:
+                f.write(best_caption+'\n')
+            else:
+                f.write(best_caption)
+        f.close()

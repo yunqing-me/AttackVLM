@@ -85,7 +85,7 @@ if __name__ == "__main__":
     parser.add_argument("--alpha", default=1.0, type=float)
     parser.add_argument("--epsilon", default=8, type=int)
     parser.add_argument("--steps", default=10, type=int)
-    parser.add_argument("--output", default="tmp", type=str, help='the folder name that restore your outputs')
+    parser.add_argument("--output", default="temp", type=str, help='the folder name that restore your outputs')
     args = parser.parse_args()
 
     alpha = args.alpha
@@ -110,7 +110,7 @@ if __name__ == "__main__":
     print(f"Done")
     
     # ------------- pre-processing images/text ------------- #
-    imagenet_data = ImageFolderWithPaths("/raid/common/imagenet-raw/val/", transform=None)
+    imagenet_data = ImageFolderWithPaths("path to imagenet val imgs", transform=None)
     target_data   = ImageFolderWithPaths("../../fine-tune/_outputs/sd_coco/", transform=None)
     
     data_loader_imagenet = torch.utils.data.DataLoader(imagenet_data, batch_size=args.batch_size, shuffle=False, num_workers=8, drop_last=False)
@@ -155,7 +155,7 @@ if __name__ == "__main__":
         
         for path_idx in range(len(path)):
             folder, name = path[path_idx].split("/")[-2], path[path_idx].split("/")[-1]
-            folder_to_save = os.path.join('../_output_img', args.output, folder)
+            folder_to_save = os.path.join(args.output, folder)
             if not os.path.exists(folder_to_save):
                 os.makedirs(folder_to_save, exist_ok=True)
             torchvision.utils.save_image(adv_image[path_idx], os.path.join(folder_to_save, name[:-4]) + 'png')

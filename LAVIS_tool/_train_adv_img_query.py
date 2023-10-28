@@ -116,9 +116,9 @@ if __name__ == "__main__":
     parser.add_argument("--alpha", default=1.0, type=float)
     parser.add_argument("--epsilon", default=8, type=int)
     parser.add_argument("--steps", default=1, type=int)
-    parser.add_argument("--output", default="tmp", type=str)
-    parser.add_argument("--data_path", default="../_output_img/blip_1_adv", type=str)
-    parser.add_argument("--text_path", default="../_output_text/blip_1_adv_pred.txt", type=str)
+    parser.add_argument("--output", default="temp", type=str)
+    parser.add_argument("--data_path", default="temp", type=str)
+    parser.add_argument("--text_path", default="temp.txt", type=str)
     
     parser.add_argument("--delta", default="normal", type=str)
     parser.add_argument("--num_query", default=20, type=int)
@@ -126,8 +126,8 @@ if __name__ == "__main__":
     parser.add_argument("--sigma", default=16, type=float)
     
     parser.add_argument("--wandb", action="store_true")
-    parser.add_argument("--wandb_project_name", type=str, default='tmp_proj')
-    parser.add_argument("--wandb_run_name", type=str, default='tmp_run')
+    parser.add_argument("--wandb_project_name", type=str, default='temp_proj')
+    parser.add_argument("--wandb_run_name", type=str, default='temp_run')
     
     args = parser.parse_args()
 
@@ -158,11 +158,11 @@ if __name__ == "__main__":
 
     if args.input_res == 384:
         vit_adv_data  = ImageFolderWithPaths(args.data_path, transform=transform_a)
-        clean_data    = ImageFolderWithPaths("/raid/common/imagenet-raw/val/", transform=transform_a)
+        clean_data    = ImageFolderWithPaths("path to imagenet-val", transform=transform_a)
     
     else:
         vit_adv_data  = ImageFolderWithPaths(args.data_path, transform=transform_b)
-        clean_data    = ImageFolderWithPaths("/raid/common/imagenet-raw/val/", transform=transform_b)
+        clean_data    = ImageFolderWithPaths("path to imagenet-val", transform=transform_b)
         
     data_loader       = torch.utils.data.DataLoader(vit_adv_data, batch_size=batch_size, shuffle=False, num_workers=24)
     clean_data_loader = torch.utils.data.DataLoader(clean_data, batch_size=batch_size, shuffle=False, num_workers=24)
@@ -180,7 +180,7 @@ if __name__ == "__main__":
         adv_vit_text_features = adv_vit_text_features.detach()
     
     # tgt text/features
-    tgt_text_path = './_coco_captions_10000.txt'
+    tgt_text_path = 'path to _coco_captions_10000.txt'
     with open(os.path.join(tgt_text_path), 'r') as f:
         tgt_text  = f.readlines()[:args.num_samples] 
         f.close()

@@ -59,7 +59,7 @@ if __name__ == "__main__":
     parser.add_argument("--alpha", default=1.0, type=float)
     parser.add_argument("--epsilon", default=8, type=int)
     parser.add_argument("--steps", default=300, type=int)
-    parser.add_argument("--output", default="tmp", type=str, help='the folder name that restore your outputs')
+    parser.add_argument("--output", default="temp", type=str, help='the folder name that restore your outputs')
     
     parser.add_argument("--model_name", default="blip_caption", type=str)
     parser.add_argument("--model_type", default="base_coco", type=str)
@@ -80,8 +80,8 @@ if __name__ == "__main__":
     print(f"Done")
     
     # ------------- pre-processing images/text ------------- #
-    imagenet_data = ImageFolderWithPaths("/raid/common/imagenet-raw/val/", transform=None)
-    target_data   = ImageFolderWithPaths("../../fine-tune/_outputs/sd_coco/", transform=None)
+    imagenet_data = ImageFolderWithPaths("path to raw imagenet val", transform=None)
+    target_data   = ImageFolderWithPaths("dir to your target data", transform=None)
     
     data_loader_imagenet = torch.utils.data.DataLoader(imagenet_data, batch_size=args.batch_size, shuffle=False, num_workers=8, drop_last=False)
     data_loader_target   = torch.utils.data.DataLoader(target_data, batch_size=args.batch_size, shuffle=False, num_workers=8, drop_last=False)
