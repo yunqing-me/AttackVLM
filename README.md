@@ -96,7 +96,7 @@ Additional implementation details of text-to-image generation by Stable Diffusio
 
 ## Prepare the VLM scripts
 
-There are two steps of adversarial attack for VLMs: (1) transfer-based attacking strategy and (2) query-based attacking strategy for the further improvement. For BLIP/BLIP-2/Img2Prompt Models, please refer to ```./LAVIS_tool```. The MiniGPT-4 and LLaVA will be also supported. Here, we use [Unidiffuser](https://github.com/thu-ml/unidiffuser) for an example. 
+There are two steps of adversarial attack for VLMs: (1) transfer-based attacking strategy and (2) query-based attacking strategy using (1) as initialization. For BLIP/BLIP-2/Img2Prompt Models, please refer to ```./LAVIS_tool```. Here, we use [Unidiffuser](https://github.com/thu-ml/unidiffuser) for an example. 
 
 ### <b> Example: Unidiffuser </b>
 - Installation
@@ -132,7 +132,7 @@ where the generated responses will be stored in `dir of white-box transfer capti
 bash _train_trans_and_query_fixed_budget.sh
 ```
 
-On the other hand, if you want to conduct transfer+query - based attack with **more perturbation budget**, we additionally provide a script:
+On the other hand, if you want to conduct transfer+query - based attack with **separate perturbation budget**, we additionally provide a script:
 
 ```
 bash _train_trans_and_query_more_budget.sh
@@ -152,10 +152,10 @@ Meanwhile, the image caption after query will be stored and the directory can be
 If you find this project useful in your research, please consider citing our paper:
 
 ```
-@article{zhao2023evaluate,
+@inproceedings{zhao2023evaluate,
   title={On Evaluating Adversarial Robustness of Large Vision-Language Models},
   author={Zhao, Yunqing and Pang, Tianyu and Du, Chao and Yang, Xiao and Li, Chongxuan and Cheung, Ngai-Man and Lin, Min},
-  journal={arXiv preprint arXiv:2305.16934},
+  booktitle={Thirty-seventh Conference on Neural Information Processing Systems},
   year={2023}
 }
 ```
