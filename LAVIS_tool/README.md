@@ -15,6 +15,8 @@ pip install -e .
 ```
 or following the steps [HERE](https://github.com/salesforce/LAVIS), and you can refer to the [ModelZoo](https://opensource.salesforce.com/LAVIS//latest/getting_started.html#model-zoo) for the possible model candidates.
 
+Please adapt our code of crafting adversarial samples shown in the main page to the MiniGPT-4 training / inference code as the principal ideas are the similar: Firstly we apply transfer-based attack through the visual encoder (it is often a pretraind Clip encoder), then we conduct the black-box attack on the LLM part of that VLM.
+
 ## <b> Example: BLIP </b>
 
 Here, we use BLIP for an example. For other models supported in the LAVIS library, please refer to their ```bash``` script (BLIP2, Img2Prompt, etc.) with similar commands as BLIP.

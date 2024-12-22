@@ -63,7 +63,7 @@ then, prepare the full targeted captions from [MS-COCO](https://cocodataset.org/
 ```
 https://drive.google.com/file/d/19tT036LBvqYonzI7PfU9qVi3jVGApKrg/view?usp=sharing
 ```
-and move it to ```./stable-diffusion/```. In experiments, one can randomly sample a subset of COCO captions (e.g., `10`, `100`, `1K`, `10K`, `50K`) for the adversarial attack. For example, lets assume we have randomly sampled `10K` COCO captions as our targeted text c_tar and stored them in the following file:
+and move it to ```./stable-diffusion/```. In experiments, one can randomly sample a subset of COCO captions (e.g., `10`, `100`, `1K`) for the adversarial attack. For example, lets assume we sampled some COCO captions from the following file as our targeted text c_tar:
 ```
 https://drive.google.com/file/d/1e5W3Yim7ZJRw3_C64yqVZg_Na7dOawaF/view?usp=sharing
 ```
@@ -147,6 +147,11 @@ An example shown as below, where the dotted line denotes the moving average of t
 Meanwhile, the image caption after query will be stored and the directory can be specified by `--output`.
 
 
+# Visualization
+The effect of the attack would be visualized upon the success of the crafted adversarial samples. If you want to visualize the heat map similar to those demonstrated in the paper or the following figure:
+![Teaser image](./assets/IMG3425_703_vis.jpg)
+please refer to the guidlines in [this tutorial](https://colab.research.google.com/github/salesforce/LAVIS/blob/main/projects/img2llm-vqa/img2llm_vqa.ipynb) or the original work of [GradCAM](https://github.com/jacobgil/pytorch-grad-cam). Please nota that there are [known limitations](https://arxiv.org/abs/1710.11063) of GradCAM.
+
 
 # Bibtex
 If you find this project useful in your research, please consider citing our paper:
@@ -160,7 +165,7 @@ If you find this project useful in your research, please consider citing our pap
 }
 ```
 
-Meanwhile, a relevant research that aims to [Embedding a Watermark to (multi-modal) Diffusion Models](https://github.com/yunqing-me/WatermarkDM):
+Meanwhile, a relevant research that aims to protect your generated assets or copyright by [Embedding a Watermark to (multi-modal) Diffusion Models](https://github.com/yunqing-me/WatermarkDM):
 ```
 @article{zhao2023recipe,
   title={A Recipe for Watermarking Diffusion Models},
@@ -169,6 +174,17 @@ Meanwhile, a relevant research that aims to [Embedding a Watermark to (multi-mod
   year={2023}
 }
 ```
+```
+@misc{pang2024device,
+  title={Device and method for watermarking a diffusion model},
+  author={Pang, Tianyu and Du, Chao and Lin, Min and Zhao, Yunqing},
+  year={2024},
+  month=sep # "~12",
+  publisher={Google Patents},
+  note={US Patent App. 18/597,640}
+}
+```
+
 
 # Acknowledgement: 
 

@@ -14,7 +14,7 @@ or following the steps [HERE](https://github.com/Vision-CAIR/MiniGPT-4), and you
 
 ## <b> MiniGPT-4 </b>
 
-[still in update...]
+Please adapt our code of crafting adversarial samples shown in the main page to the MiniGPT-4 training / inference code as the principal ideas are the similar: Firstly we apply transfer-based attack through the visual encoder (it is often a pretraind Clip encoder), then we conduct the black-box attack on the LLM part of that VLM.
 
 ### Transfer-based attacking strategy
 
