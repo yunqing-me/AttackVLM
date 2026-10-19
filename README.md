@@ -103,7 +103,7 @@ There are two steps of adversarial attack for VLMs: (1) transfer-based attacking
 ```
 git clone https://github.com/thu-ml/unidiffuser.git
 cd unidiffuser
-cp ../unidff_tool/* ./
+cp ../unidiff_tool/* ./
 ```
 then, create a suitable conda environment named `unidiffuser` following the steps [HERE](https://github.com/thu-ml/unidiffuser#:~:text=to%2Dimage%20generation\).-,Dependency,-conda%20create%20%2Dn), and prepare the corresponding model weights (we use `uvit_v1.pth` as the weight of U-ViT).
 
