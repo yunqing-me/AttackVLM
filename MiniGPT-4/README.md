@@ -10,11 +10,11 @@ cd MiniGPT-4
 conda env create -f environment.yml
 conda activate minigpt4
 ```
-or following the steps [HERE](https://github.com/Vision-CAIR/MiniGPT-4), and you can refer to the [LLM weights](https://github.com/Vision-CAIR/MiniGPT-4#:~:text=Prepare%20the%20pretrained%20LLM%20weights) for the possible model candidates.
+or follow the steps [HERE](https://github.com/Vision-CAIR/MiniGPT-4), and you can refer to the [LLM weights](https://github.com/Vision-CAIR/MiniGPT-4#:~:text=Prepare%20the%20pretrained%20LLM%20weights) for the possible model candidates.
 
 ## <b> MiniGPT-4 </b>
 
-Please adapt our code of crafting adversarial samples shown in the main page to the MiniGPT-4 training / inference code as the principal ideas are the similar: Firstly we apply transfer-based attack through the visual encoder (it is often a pretraind Clip encoder), then we conduct the black-box attack on the LLM part of that VLM.
+Please adapt our code for crafting adversarial samples shown in the main page to the MiniGPT-4 training / inference code as the principal ideas are the same: First, we apply a transfer-based attack through the visual encoder (it is often a pretrained CLIP encoder), then we conduct the black-box attack on the LLM part of that VLM.
 
 ### Transfer-based attacking strategy
 

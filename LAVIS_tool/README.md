@@ -2,7 +2,7 @@
 
 ## Prepare the VLMs in LAVIS Lib
 
-There are two steps of adversarial attack for VLMs: (1) transfer-based attacking strategy and (2) query-based attacking strategy for the further improvement.
+There are two steps in an adversarial attack for VLMs: (1) transfer-based attacking strategy and (2) query-based attacking strategy for further improvement.
 
 ### Building a suitable LAVIS environment
 ```
@@ -13,13 +13,13 @@ git clone https://github.com/salesforce/LAVIS.git
 cd LAVIS
 pip install -e .
 ```
-or following the steps [HERE](https://github.com/salesforce/LAVIS), and you can refer to the [ModelZoo](https://opensource.salesforce.com/LAVIS//latest/getting_started.html#model-zoo) for the possible model candidates.
+or follow the steps [HERE](https://github.com/salesforce/LAVIS), and you can refer to the [ModelZoo](https://opensource.salesforce.com/LAVIS//latest/getting_started.html#model-zoo) for the possible model candidates.
 
-Please adapt our code of crafting adversarial samples shown in the main page to the training / inference code as the principal ideas are the similar: Firstly we apply transfer-based attack through the visual encoder (it is often a pretraind Clip encoder), then we conduct the black-box attack on the LLM part of that VLM.
+Please adapt our code for crafting adversarial samples shown in the main page to the training / inference code as the principal ideas are the same: First, we apply a transfer-based attack through the visual encoder (it is often a pretrained CLIP encoder), then we conduct the black-box attack on the LLM part of that VLM.
 
 ## <b> Example: BLIP </b>
 
-Here, we use BLIP for an example. For other models supported in the LAVIS library, please refer to their ```bash``` script (BLIP2, Img2Prompt, etc.) with similar commands as BLIP.
+Here, we use BLIP as an example. For other models supported in the LAVIS library, please refer to their ```bash``` script (BLIP2, Img2Prompt, etc.) with similar commands as BLIP.
 ### Transfer-based attacking strategy
 
 ```
@@ -68,4 +68,4 @@ python _train_adv_img_query.py \
     --wandb_run_name blip
 ```
 
-Note that this is for fixed perturbation budget (e.g., 8 px) of `MF-ii+MF-tt`. If you plan to assign more budget, please modify the corresponding hyper-parameters accordingly (also see other models in `bash_adv_img_query.sh`).
+Note that this is for a fixed perturbation budget (e.g., 8 px) of `MF-ii+MF-tt`. If you plan to assign more budget, please modify the corresponding hyper-parameters accordingly (also see other models in `bash_adv_img_query.sh`).
