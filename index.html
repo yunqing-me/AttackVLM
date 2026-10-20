@@ -248,7 +248,7 @@
             resulting in a surprisingly high success rate for generating targeted responses. 
             </p>
             <p>
-            Overall, Our investigation and findings in this work provide a quantitative understanding 
+            Overall, our investigation and findings in this work provide a quantitative understanding
             regarding the adversarial vulnerability of large VLMs and call for a more thorough examination of their potential security flaws before deployment in practice.
             </p>
         </p>
@@ -483,10 +483,10 @@
                   and text-to-image generation. Consequently, given an original text description (e.g., An oil painting of a bridge in rains. Monet Style), 
                   the text-to-image direction of UniDiffuser is used to generate the corresponding clean image, 
                   and its image-to-text direction can recover a text response (e.g., A painting of a bridge at night by Monet) similar to the original text description. 
-                  The recovering between image and text modalities can be performed consistently on clean images. 
+                  Recovery between image and text modalities can be performed consistently on clean images.
                   When a targeted adversarial perturbation is added to a clean image, however, the image-to-text direction of UniDiffuser will return a text 
                   (e.g., A small white dog sitting in the grass near a stream in Autumn) that semantically resembles the predefined targeted description 
-                  (e.g., A small white dog sitting on the ground in autumn leaves), thereby affecting the subsequent chains of recovering processes.
+                  (e.g., A small white dog sitting on the ground in autumn leaves), thereby affecting the subsequent chains of recovery processes.
               </td>
             </tr>
           </center>
@@ -507,10 +507,10 @@
                 <p style="text-align:justify; text-justify:inter-ideograph;"> 
                   <b> Image captioning task implemented by BLIP-2.</b> Given an original text description, 
                   DALL-E/Midjourney/Stable Diffusion is used to generate corresponding
-                  clean images. Note that real images can also be the clean image. 
+                  clean images. Note that real images can also serve as clean images.
                   BLIP-2 accurately returns captioning text (e.g., A field with yellow flowers and a sky full of clouds) 
-                  that analogous to the original text description / the content on the clean image. 
-                  After the clean image is maliciously perturbed by targeted adversarial noises, the adversarial image can mislead
+                  that is analogous to the original text description / the content on the clean image.
+                  After the clean image is maliciously perturbed by targeted adversarial noise, the adversarial image can mislead
                   BLIP-2 to return a caption (e.g., A cartoon drawn on the side of an old computer) that semantically resembles the predefined targeted response 
                   (e.g., A computer from the 90s in the style of vaporwave). 
               </td>
@@ -639,7 +639,7 @@
 
         <div class="content has-text-justified">
           <p>
-            There's a lot of excellent works that builds large vision-language models in recent days, for example:
+            There are many excellent works that build large vision-language models, for example:
           </p>
           <p>
             - <a href="https://github.com/salesforce/LAVIS">LAVIS</a> is a one-stop Library for Language-Vision Intelligence.
@@ -648,7 +648,7 @@
             - <a href="https://github.com/Vision-CAIR/MiniGPT-4">MiniGPT-4 and LLaVA</a> perform Vision Question-Answering on top of Large Language Models (LLMs).
           </p>
           <p>
-            - <a href="https://github.com/thu-ml/unidiffuser">Unidiffuser</a> can achieve multi-modal join generation by using a single ViT.
+            - <a href="https://github.com/thu-ml/unidiffuser">Unidiffuser</a> can achieve multimodal joint generation by using a single ViT.
           </p>
         </div>
       </div>
