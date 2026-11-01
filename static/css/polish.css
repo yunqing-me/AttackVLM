@@ -6,11 +6,10 @@ body { -webkit-font-smoothing: antialiased; }
 #abstract, #BibTeX { scroll-margin-top: 24px; }
 .retrospective-note { margin-bottom: 2.5rem; padding: 28px 30px 24px; border-radius: 16px; background: #f1f4f6; text-align: left; }
 .retrospective-note .title.is-4 { margin-bottom: 1.25rem; color: #222; font-size: 25px; font-weight: 700; letter-spacing: -.015em; }
-.retrospective-note .content { font-family: inherit; font-size: 17px; line-height: 1.75; }
+.retrospective-note .content, .retrospective-note .retrospective-date { font-family: inherit; font-size: 17px; line-height: 1.75; }
 .retrospective-note .content a { color: #206f99; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
-.retrospective-note .content .key-finding { font-weight: 600; }
-.retrospective-note .retrospective-date { margin-top: 1.5rem; color: #555; font-size: 13px; line-height: 1.65; }
-.retrospective-date strong { color: #333; }
+.retrospective-note .content .key-finding { display: inline; font-weight: 600; }
+.retrospective-note .retrospective-date { margin-top: 1.5rem; color: #000; font-weight: 700; }
 .navbar-burger { display: none; }
 .publication-title { line-height: 1.16; letter-spacing: -.018em; }
 .publication-authors { line-height: 1.65; }
@@ -75,7 +74,7 @@ body:has(.figure-dialog[open]) { overflow: hidden; }
   .section .content, .section .content p { text-align: left !important; text-justify: auto !important; }
   .retrospective-note { padding: 22px 20px 20px; margin-bottom: 2rem; border-radius: 12px; }
   .retrospective-note .title.is-4 { font-size: 22px; }
-  .retrospective-note .content { font-size: 16px; line-height: 1.75; }
+  .retrospective-note .content, .retrospective-note .retrospective-date { font-size: 16px; line-height: 1.75; }
   .section table td { padding-inline: 0; }
   .section pre { font-size: 12px; padding: 16px; }
   .footer { padding: 2rem 1.25rem; }
