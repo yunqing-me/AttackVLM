@@ -3,13 +3,7 @@
 body { -webkit-font-smoothing: antialiased; }
 .key-finding { color: var(--rubine-red); font-weight: 700; }
 .key-finding:first-child { display: inline-block; max-width: 100%; }
-#abstract, #BibTeX { scroll-margin-top: 24px; }
-.retrospective-note { margin-bottom: 2.5rem; padding: 22px 24px; border-left: 3px solid var(--rubine-red); background: #f8f8f9; text-align: left; }
-.retrospective-date { margin-bottom: 10px; color: #666; font-size: 12px; letter-spacing: .025em; }
-.retrospective-note .title.is-4 { margin-bottom: 1rem; font-size: 24px; }
-.retrospective-note .content { font-size: 15px; }
-.retrospective-note .content a { text-decoration: underline; text-underline-offset: 2px; }
-.retrospective-scope { margin-top: 1rem; color: #666; font-size: 12px; line-height: 1.65; }
+#abstract { scroll-margin-top: 24px; }
 .navbar-burger { display: none; }
 .publication-title { line-height: 1.16; letter-spacing: -.018em; }
 .publication-authors { line-height: 1.65; }
@@ -72,8 +66,6 @@ body:has(.figure-dialog[open]) { overflow: hidden; }
   .section .title.is-3 { font-size: 26px; }
   .section .content { font-size: 15px; line-height: 1.8; }
   .section .content, .section .content p { text-align: left !important; text-justify: auto !important; }
-  .retrospective-note { padding: 18px 16px; margin-bottom: 2rem; }
-  .retrospective-note .title.is-4 { font-size: 22px; }
   .section table td { padding-inline: 0; }
   .section pre { font-size: 12px; padding: 16px; }
   .footer { padding: 2rem 1.25rem; }
