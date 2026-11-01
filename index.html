@@ -1,44 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="description"
-        content="Deformable Neural Radiance Fields creates free-viewpoint portraits (nerfies) from casually captured videos.">
-  <meta name="keywords" content="Nerfies, D-NeRF, NeRF">
+        content="On Evaluating Adversarial Robustness of Large Vision-Language Models. AttackVLM, NeurIPS 2023.">
+  <meta name="keywords" content="AttackVLM, vision-language models, adversarial robustness, NeurIPS 2023">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="canonical" href="https://yunqing-me.github.io/AttackVLM/">
   <title>AttackVLM: On Evaluating Adversarial Robustness of Large Vision-Language Models</title>
-
-  <!-- Global site tag (gtag.js) - Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-
-    function gtag() {
-      dataLayer.push(arguments);
-    }
-
-    gtag('js', new Date());
-
-    gtag('config', 'G-PYVRSFMDRL');
-  </script>
 
   <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
         rel="stylesheet">
 
   <link rel="stylesheet" href="./static/css/bulma.min.css">
-  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
-  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
   <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
   <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
   <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="stylesheet" href="./static/css/polish.css">
   <!-- <link rel="icon" href="./static/images/favicon.svg"> -->
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script defer src="./static/js/fontawesome.all.min.js"></script>
-  <script src="./static/js/bulma-carousel.min.js"></script>
-  <script src="./static/js/bulma-slider.min.js"></script>
-  <script src="./static/js/index.js"></script>
+  <script defer src="./static/js/polish.js"></script>
 </head>
 <body>
 
@@ -65,9 +48,9 @@
             <span class="author-block">
               <a href="https://yunqing-me.github.io/">Yunqing Zhao</a><sup>1*</sup>,</span>
             <span class="author-block">
-              <a href="https://p2333.github.io/">Tianyu Pang</a><sup>2*&#9768;</sup>,</span>
+              <a href="https://p2333.github.io/">Tianyu Pang</a><sup>2*&dagger;</sup>,</span>
             <span class="author-block">
-              <a href="https://duchao0726.github.io/">Chao Du</a><sup>2&#9768;</sup>,
+              <a href="https://duchao0726.github.io/">Chao Du</a><sup>2&dagger;</sup>,
             </span>
             <span class="author-block">
               <a href="https://ml.cs.tsinghua.edu.cn/~xiaoyang/">Xiao Yang</a><sup>3</sup>,
@@ -76,22 +59,22 @@
               <a href="https://zhenxuan00.github.io/">Chongxuan Li</a><sup>4</sup>,
             </span><br>
             <span class="author-block">
-              <a href="https://sites.google.com/site/mancheung0407/">Ngai-Man Cheung</a><sup>1&#9768;</sup>,
+              <a href="https://sites.google.com/site/mancheung0407/">Ngai-Man Cheung</a><sup>1&dagger;</sup>,
             </span>
             <span class="author-block">
               <a href="https://linmin.me/">Min Lin</a><sup>2</sup>
             </span>
             <br>
             <span class="author-block">
-              <sup>*</sup>Equal Contribution, <sup>&#9768;</sup>Equal Advice
+              <sup>*</sup>Equal Contribution, <sup>&dagger;</sup>Corresponding authors
             </span>
           </div>
 
           <div class="is-size-5 publication-authors">
             <span class="author-block"><sup>1</sup>Singapore University of Technology and Design</span><br>
             <span class="author-block"><sup>2</sup>Sea AI Lab, Singapore</span><br>
-            <span class="author-block"><sup>2</sup>Tsinghua University</span>&nbsp;&nbsp;&nbsp;&nbsp;
-            <span class="author-block"><sup>2</sup>Renmin University of China</span>
+            <span class="author-block"><sup>3</sup>Tsinghua University</span>&nbsp;&nbsp;&nbsp;&nbsp;
+            <span class="author-block"><sup>4</sup>Renmin University of China</span>
           </div>
 
           <div class="column has-text-centered">
@@ -117,10 +100,10 @@
               </span>
               <!-- Video Link. -->
               <span class="link-block">
-                <a href="https://nips.cc/media/PosterPDFs/NeurIPS%202023/69997.png?t=1698643542.2976496"
+                <a href="https://neurips.cc/media/PosterPDFs/NeurIPS%202023/69997.png"
                    class="external-link button is-normal is-rounded is-dark">
                   <span class="icon">
-                      <i class="fab fa-youtube"></i>
+                      <i class="fas fa-image"></i>
                   </span>
                   <span>Poster</span>
                 </a>
@@ -233,22 +216,22 @@
     <!-- Abstract. -->
     <div class="columns is-centered has-text-centered">
       <div class="column is-four-fifths">
-        <h2 class="title is-2" >Abstract</h2>
+        <h2 class="title is-2" id="abstract">Abstract</h2>
         <div class="content has-text-justified">
           <p>
-            Large vision-language models (VLMs) such as GPT-4 have achieved unprecedented performance in response generation, especially with visual inputs, 
+            <strong class="key-finding">Visual vulnerability.</strong> Large vision-language models (VLMs) such as GPT-4 have achieved unprecedented performance in response generation, especially with visual inputs,
             enabling more creative and adaptable interaction than large language models such as ChatGPT. 
             Nonetheless, multimodal generation exacerbates safety concerns, 
             since adversaries may successfully evade the entire system by subtly manipulating the most vulnerable modality (e.g., vision). 
             <p>
-            To this end, we propose evaluating the robustness of open-source large VLMs in the most realistic and high-risk setting, 
+            <strong class="key-finding">Black-box transferability.</strong> To this end, we propose evaluating the robustness of open-source large VLMs in the most realistic and high-risk setting,
             where adversaries have only black-box system access and seek to deceive the model into returning the targeted responses. 
             In particular, we first craft targeted adversarial examples against pretrained models such as CLIP and BLIP, and then transfer these adversarial examples to other VLMs such as MiniGPT-4, LLaVA, UniDiffuser, BLIP-2, and Img2Prompt. 
-            In addition, we observe that black-box queries on these VLMs can further improve the effectiveness of targeted evasion, 
+            In addition, we observe that black-box queries on these VLMs can <strong class="key-finding">further improve the effectiveness of targeted evasion</strong>,
             resulting in a surprisingly high success rate for generating targeted responses. 
             </p>
             <p>
-            Overall, our investigation and findings in this work provide a quantitative understanding
+            <strong class="key-finding">Robustness before deployment.</strong> Overall, our investigation and findings in this work provide a quantitative understanding
             regarding the adversarial vulnerability of large VLMs and call for a more thorough examination of their potential security flaws before deployment in practice.
             </p>
         </p>
@@ -388,7 +371,7 @@
 					<tr>
 						<td width=260px>
 							<center>
-								<img class="round" style="width:880px" src="./assets/teaser_4.jpg"/>
+								<img class="round" style="width:880px" src="./assets/teaser_4.jpg" alt="AttackVLM method overview: transfer-based and query-based attacking strategies" width="4385" height="1961"/>
 							</center>
 						</td>
 					</tr>
@@ -440,7 +423,7 @@
 					<tr>
 						<td width=260px>
 							<center>
-								<img class="round" style="width:880px" src="./assets/teaser_minigpt4.jpg"/>
+								<img class="round" style="width:880px" src="./assets/teaser_minigpt4.jpg" alt="MiniGPT-4: conversations with clean and adversarial images" width="5325" height="2742"/>
 							</center>
 						</td>
 					</tr>
@@ -450,10 +433,10 @@
             <tr>
               <td>
                 <p style="text-align:justify; text-justify:inter-ideograph;"> 
-                  <b>Visual question-answering (VQA) task implemented by MiniGPT-4.</b> MiniGPT-4 has
+                  <strong class="key-finding">Effects persist across turns.</strong> <b>Visual question-answering (VQA) task implemented by MiniGPT-4.</b> MiniGPT-4 has
                   capabilities for vision-language understanding and performs comparably to GPT-4 on tasks such
                   as multi-round VQA by leveraging the knowledge of large LMs. We select images with refined
-                  details generated by Midjourney [48] and feed questions (e.g., Can you tell me what is the
+                  details generated by Midjourney <a href="https://arxiv.org/html/2305.16934v2#bib.bib51" target="_blank" rel="noopener">[51]</a> and feed questions (e.g., Can you tell me what is the
                   interesting point of this image?) into MiniGPT-4. As expected, MiniGPT-4 can return
                   descriptions that are intuitively reasonable, and when we ask additional questions (e.g., But is this
                   a common scene in the normal life?), MiniGPT-4 demonstrates the capacity for accurate
@@ -468,7 +451,7 @@
 					<tr>
 						<td width=260px>
               <center>
-                <img class="round" style="width:880px" src="./assets/teaser_unidiff.jpg"/>
+                <img class="round" style="width:880px" src="./assets/teaser_unidiff.jpg" alt="UniDiffuser: joint image-text generation with clean and adversarial images" width="5325" height="2020"/>
               </center>
 						</td>
 					</tr>
@@ -478,7 +461,7 @@
             <tr>
               <td>
                 <p style="text-align:justify; text-justify:inter-ideograph;"> 
-                  <b> Joint generation task implemented by UniDiffuser.</b> There are generative VLMs such as
+                  <strong class="key-finding">Cross-modal propagation.</strong> <b>Joint generation task implemented by UniDiffuser.</b> There are generative VLMs such as
                   UniDiffuser that model the joint distribution of image-text pairs and are capable of both image-to-text
                   and text-to-image generation. Consequently, given an original text description (e.g., An oil painting of a bridge in rains. Monet Style), 
                   the text-to-image direction of UniDiffuser is used to generate the corresponding clean image, 
@@ -495,7 +478,7 @@
 					<tr>
 						<td width=260px>
               <center>
-                <img class="round" style="width:880px" src="./assets/teaser_blip2.jpg"/>
+                <img class="round" style="width:880px" src="./assets/teaser_blip2.jpg" alt="BLIP-2: captions for clean and adversarial images" width="5329" height="2849"/>
               </center>
 						</td>
 					</tr>
@@ -505,7 +488,7 @@
             <tr>
               <td>
                 <p style="text-align:justify; text-justify:inter-ideograph;"> 
-                  <b> Image captioning task implemented by BLIP-2.</b> Given an original text description, 
+                  <strong class="key-finding">Targeted caption redirection.</strong> <b>Image captioning task implemented by BLIP-2.</b> Given an original text description,
                   DALL-E/Midjourney/Stable Diffusion is used to generate corresponding
                   clean images. Note that real images can also serve as clean images.
                   BLIP-2 accurately returns captioning text (e.g., A field with yellow flowers and a sky full of clouds) 
@@ -523,6 +506,93 @@
     </div>
     <!--/ Overview -->
     
+  </div>
+</section>
+
+<section class="section paper-extension" id="quantitative-results" aria-labelledby="quantitative-title">
+  <div class="container is-max-desktop">
+    <div class="study-body content has-text-justified">
+      <h2 class="title is-3" id="quantitative-title">Quantitative Results</h2>
+      <p><strong class="key-finding">Image-image matching transfers better.</strong> In the six evaluated models, MF-ii achieves higher ensemble scores than MF-it. Starting from MF-ii and refining the image with black-box text feedback gives the highest target alignment among the reported strategies for every model.</p>
+
+      <div class="study-setting">
+        <p><b>Evaluation setting.</b> Clean images come from ImageNet-1K validation; target descriptions are randomly selected MS-COCO captions. Victim models remain frozen, the input question stays fixed, and only the image is modified. The default constraint is <span class="math-expression">‖x<sub>adv</sub> − x<sub>cle</sub>‖<sub>∞</sub> ≤ 8</span> on pixel values in [0, 255]. <a href="https://arxiv.org/html/2305.16934v2#S4.SS1" target="_blank" rel="noopener">Setup details ↗</a></p>
+      </div>
+
+      <table class="score-table" aria-describedby="score-note">
+        <caption>Response–target CLIP text similarity · Ensemble score ↑ · Unitless</caption>
+        <thead><tr><th scope="col">Victim model</th><th scope="col">Clean image</th><th scope="col">MF-it</th><th scope="col">MF-ii</th><th scope="col">MF-ii<br>+ MF-tt</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">BLIP</th><td>0.450</td><td>0.483</td><td>0.755</td><td class="best-score">0.846</td></tr>
+          <tr><th scope="row">UniDiffuser</th><td>0.402</td><td>0.656</td><td>0.700</td><td class="best-score">0.743</td></tr>
+          <tr><th scope="row">Img2Prompt</th><td>0.461</td><td>0.470</td><td>0.476</td><td class="best-score">0.791</td></tr>
+          <tr><th scope="row">BLIP-2</th><td>0.452</td><td>0.483</td><td>0.543</td><td class="best-score">0.638</td></tr>
+          <tr><th scope="row">LLaVA</th><td>0.388</td><td>0.397</td><td>0.400</td><td class="best-score">0.542</td></tr>
+          <tr><th scope="row">MiniGPT-4</th><td>0.417</td><td>0.443</td><td>0.522</td><td class="best-score">0.614</td></tr>
+        </tbody>
+      </table>
+      <p class="paper-source" id="score-note">Source: <a href="https://arxiv.org/html/2305.16934v2#S3.T2" target="_blank" rel="noopener">Table 2, ensemble column</a>. Values are reproduced from the paper. Higher scores mean that the model’s response is semantically closer to the predefined target text.</p>
+      <p class="method-key"><b>MF-it:</b> image-text feature matching. &nbsp; <b>MF-ii:</b> image-image feature matching. &nbsp; <b>MF-tt:</b> query-based text-text matching.</p>
+      <p><strong class="key-finding">Query feedback makes a difference.</strong> For example, Img2Prompt increases from 0.476 with MF-ii to 0.791 with MF-ii + MF-tt; LLaVA increases from 0.400 to 0.542. The comparison separates the benefit of transferable perturbations from the additional benefit of refining them against the victim’s returned text.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section paper-extension" id="further-analyses" aria-labelledby="analyses-title">
+  <div class="container is-max-desktop">
+    <div class="study-body content has-text-justified">
+      <h2 class="title is-3" id="analyses-title">Further Analyses</h2>
+
+      <article class="finding-block" id="transfer-query-ablation" aria-labelledby="ablation-title">
+        <h3 class="title is-4" id="ablation-title">Why Combine Transfer and Queries?</h3>
+        <p><strong class="key-finding">The two stages are complementary.</strong> The UniDiffuser ablation compares different allocations of a fixed perturbation budget. Combining transfer-based initialization with query-based refinement is more effective than relying on either stage alone in this experiment.</p>
+        <figure class="study-figure">
+          <img class="round" src="assets/ablation.png" alt="Original Figure 7: four CLIP evaluation panels comparing transfer/query perturbation-budget allocations on UniDiffuser" width="2031" height="394" loading="lazy">
+          <figcaption class="paper-source"><a href="https://arxiv.org/html/2305.16934v2#S4.F7" target="_blank" rel="noopener">Original Fig. 7</a>. Horizontal axis: transfer/query budget allocation; vertical axis: response–target CLIP text similarity (unitless, ↑). Panels use different CLIP text encoders. The dotted t+q=8 line uses full-budget transfer initialization followed by query refinement, with the final perturbation still constrained to ε = 8. Click the figure to enlarge.</figcaption>
+        </figure>
+      </article>
+
+      <article class="finding-block" id="perturbation-budget" aria-labelledby="budget-title">
+        <h3 class="title is-4" id="budget-title">Perturbation Budget and Image Quality</h3>
+        <p><strong class="key-finding">Larger perturbations bring diminishing returns.</strong> In this UniDiffuser example, increasing ε eventually gives captions with similar target semantics while moving the image further from the clean input. The paper uses ε = 8 as its default balance between the visual constraint and targeted generation.</p>
+        <figure class="study-figure">
+          <img class="round" src="assets/eps.png" alt="Original Figure 6: increasing epsilon from 2 to 64 changes UniDiffuser captions toward a fish target while LPIPS distance rises" width="2032" height="404" loading="lazy">
+          <figcaption class="paper-source"><a href="https://arxiv.org/html/2305.16934v2#S4.F6" target="_blank" rel="noopener">Original Fig. 6</a>. ε is the pixel-wise ℓ<sub>∞</sub> budget on the [0, 255] scale. LPIPS measures perceptual distance from the clean image (↓): 0.013, 0.019, 0.054, 0.116, and 0.158 at ε = 2, 4, 8, 16, and 64 in this example. Click the figure to enlarge.</figcaption>
+        </figure>
+      </article>
+
+      <article class="finding-block" id="perturbation-semantics" aria-labelledby="semantics-title">
+        <h3 class="title is-4" id="semantics-title">What Does the Perturbation Reveal?</h3>
+        <p><strong class="key-finding">The target is hard to recognize from the perturbation alone.</strong> The full adversarial image redirects the generated caption toward the target. However, the isolated difference image and its UniDiffuser caption do not reveal the target concept in the illustrated example. The residual is amplified tenfold so that it can be inspected visually.</p>
+        <figure class="study-figure">
+          <img class="round" src="assets/difference.png" alt="Original Figure 5: target image, adversarial image, clean image, and ten-times-amplified perturbation with UniDiffuser captions" width="1912" height="539" loading="lazy">
+          <figcaption class="paper-source"><a href="https://arxiv.org/html/2305.16934v2#S4.F5" target="_blank" rel="noopener">Original Fig. 5</a>. The residual is Δ = x<sub>adv</sub> − x<sub>clean</sub>, displayed at ×10 amplification. UniDiffuser supplies the captions; DALL-E supplies the reference target image. Click the figure to enlarge.</figcaption>
+        </figure>
+      </article>
+
+      <article class="finding-block" id="visual-grounding" aria-labelledby="grounding-title">
+        <h3 class="title is-4" id="grounding-title">How Does Visual Grounding Change?</h3>
+        <p><strong class="key-finding">Question-related relevance shifts.</strong> In the Img2Prompt example, GradCAM highlights the skateboard for a question about the clean scene, but shifts toward background regions for the adversarial image. When conditioned on the target description, the adversarial image’s relevance pattern resembles that of the reference target image.</p>
+        <figure class="study-figure">
+          <img class="round" src="assets/cam.png" alt="Original Figure 8: Img2Prompt GradCAM visualizations for clean, adversarial, and target images under scene-related and target-related questions" width="2043" height="441" loading="lazy">
+          <figcaption class="paper-source"><a href="https://arxiv.org/html/2305.16934v2#S4.F8" target="_blank" rel="noopener">Original Fig. 8</a>. GradCAM visualizations for Img2Prompt. These provide a feature-attribution view of the example; <a href="https://arxiv.org/html/2305.16934v2#S4.SS3" target="_blank" rel="noopener">Sec. 4.3</a> also discusses the interpretation’s limitations. Click the figure to enlarge.</figcaption>
+        </figure>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section paper-extension" id="failure-cases" aria-labelledby="failure-title">
+  <div class="container is-max-desktop">
+    <div class="study-body content has-text-justified">
+      <h2 class="title is-3" id="failure-title">Failure Cases and Scope</h2>
+      <p><strong class="key-finding">Some responses retain the original scene.</strong> The appendix includes LLaVA examples in which the response changes but still describes concepts from the clean image, rather than following the intended target. The paper reports that additional optimization steps can improve these cases while keeping the same perturbation budget.</p>
+      <figure class="study-figure failure-figure">
+        <img class="round" src="assets/fail_0.png" alt="Original Figure 16, first example: LLaVA still describes dogs after an attack targeting a scene of people walking past bicycles" width="1965" height="1292" loading="lazy">
+        <figcaption class="paper-source"><a href="https://arxiv.org/html/2305.16934v2#A3.F16" target="_blank" rel="noopener">Original Fig. 16, Example 1</a>. A failure case from the LLaVA evaluation. The target describes people and bicycles; the adversarial response retains dog-related content. See <a href="https://arxiv.org/html/2305.16934v2#A3.SS2" target="_blank" rel="noopener">Appendix C.2</a>. Click the figure to enlarge.</figcaption>
+      </figure>
+      <p><strong class="key-finding">Digital-domain evaluation.</strong> The results concern the paper’s evaluated open-source checkpoints and images fed directly into those models. <a href="https://arxiv.org/html/2305.16934v2#S5" target="_blank" rel="noopener">The discussion</a> identifies physical-world evaluation, including camera-captured inputs, as future work.</p>
+    </div>
   </div>
 </section>
 

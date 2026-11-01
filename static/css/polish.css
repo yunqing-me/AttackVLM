@@ -1,0 +1,88 @@
+/* Small additions to the original Nerfies page. Keep its desktop layout. */
+:root { --rubine-red: #ce0058; }
+body { -webkit-font-smoothing: antialiased; }
+.key-finding { color: var(--rubine-red); font-weight: 700; }
+.key-finding:first-child { display: inline-block; max-width: 100%; }
+#abstract { scroll-margin-top: 24px; }
+.navbar-burger { display: none; }
+.publication-title { line-height: 1.16; letter-spacing: -.018em; }
+.publication-authors { line-height: 1.65; }
+.publication-authors a { color: #247cab !important; }
+.publication-links .button { min-height: 40px; }
+.section .content { line-height: 1.75; }
+.section .title { line-height: 1.3; }
+.section table { width: min(880px, 100%); max-width: 100%; table-layout: fixed; margin-inline: auto; }
+.section table[width="850px"] { width: min(850px, 100%); }
+.section td[width] { width: auto; }
+.section img.round { max-width: 100%; height: auto; border-radius: 4px; }
+.paper-figure { display: block; width: 100%; padding: 0; margin: 0; border: 0; background: transparent; cursor: zoom-in; }
+.paper-figure img { display: block; margin-inline: auto; }
+.paper-figure:focus-visible, .figure-close:focus-visible, .figure-zoom:focus-visible, .figure-viewport:focus-visible, a:focus-visible { outline: 2px solid #247cab; outline-offset: 4px; }
+.section pre { white-space: pre-wrap; overflow-wrap: anywhere; border-radius: 4px; line-height: 1.65; }
+.footer .content { color: #60666c; font-size: 14px; line-height: 1.7; }
+.figure-dialog { width: min(1280px, calc(100% - 28px)); max-height: 94vh; padding: 0; border: 1px solid #d5d9dd; border-radius: 6px; color: #363636; }
+.figure-dialog::backdrop { background: #1a202bb3; }
+.figure-toolbar { position: sticky; top: 0; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 16px; background: #fff; border-bottom: 1px solid #e4e6e8; }
+.figure-toolbar p { min-width: 0; margin: 0; font: 13px/1.5 'Noto Sans', sans-serif; }
+.figure-controls { display: flex; flex-shrink: 0; gap: 8px; }
+.figure-close, .figure-zoom { flex-shrink: 0; min-height: 36px; border: 1px solid #ddd; border-radius: 4px; padding: 4px 12px; background: #fff; color: #444; cursor: pointer; }
+.figure-viewport { max-height: min(70vh, 800px); overflow: auto; overscroll-behavior: contain; }
+.figure-viewport img { display: block; width: 100%; max-width: none; height: auto; }
+.figure-viewport[data-original-size="true"] img { width: auto; min-width: 100%; }
+.figure-footer { padding: 12px 16px 16px; font-size: 13px; }
+.figure-hint { margin: 0 0 5px; color: #666; font-size: 12px; }
+.figure-original { display: inline-block; }
+body:has(.figure-dialog[open]) { overflow: hidden; }
+.math-expression { white-space: nowrap; }
+.paper-extension { padding-top: 2rem; padding-bottom: 2rem; }
+.paper-extension .study-body { max-width: 880px; margin-inline: auto; }
+.paper-extension .title { scroll-margin-top: 24px; }
+.paper-extension .study-setting { margin: 1.5rem 0; padding: 14px 18px; border-left: 3px solid #dedfe2; background: #f7f7f8; font-size: 14px; line-height: 1.7; text-align: left; }
+.paper-extension .study-setting p { margin: 0; }
+.paper-extension .score-table { width: 100%; margin: 1.5rem 0 .7rem; border-collapse: collapse; table-layout: fixed; font-size: 15px; font-variant-numeric: tabular-nums; }
+.score-table caption { padding-bottom: 12px; text-align: left; font-size: 14px; font-weight: 600; color: #444; }
+.paper-extension .score-table th, .paper-extension .score-table td { text-align: right; vertical-align: middle; padding: 11px 10px; border-bottom: 1px solid #e5e5e5; }
+.paper-extension .score-table th:first-child { width: 26%; text-align: left; }
+.paper-extension .score-table thead th { text-align: right; font-size: 13px; line-height: 1.5; font-weight: 600; border-top: 1px solid #aaa; border-bottom: 1px solid #aaa; }
+.paper-extension .score-table tbody th { font-weight: 400; }
+.score-table .best-score { color: var(--rubine-red); font-weight: 700; }
+.paper-extension .paper-source { margin-top: 12px; color: #666; font-size: 13px; line-height: 1.7; text-align: left; font-style: normal; }
+.paper-extension .method-key { font-size: 13px; line-height: 1.75; color: #555; text-align: left; }
+.finding-block .title.is-4 { margin-bottom: 1rem; font-size: 24px; }
+.finding-block + .finding-block { margin-top: 2.75rem; padding-top: 2rem; border-top: 1px solid #e5e5e5; }
+.paper-extension .study-figure { margin: 1.4rem 0 1.5rem; }
+.paper-extension .study-figure img { width: 100%; height: auto; }
+.paper-extension .failure-figure { max-width: 760px; margin-inline: auto; }
+@media (max-width: 768px) {
+  .navbar { min-height: 1rem; }
+  .hero-body { padding: 2rem 1.25rem 1.5rem; }
+  .publication-title.title.is-1 { font-size: 32px; line-height: 1.18; letter-spacing: -.022em; }
+  .publication-title br { display: none; }
+  .publication-authors.is-size-5 { font-size: 16px !important; line-height: 1.75; }
+  .publication-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 6px; }
+  .link-block a { margin-block: 3px; }
+  .section { padding: 2rem 1.25rem; }
+  .section .title.is-2 { font-size: 30px; }
+  .section .title.is-3 { font-size: 26px; }
+  .section .content { font-size: 15px; line-height: 1.8; }
+  .section .content, .section .content p { text-align: left !important; text-justify: auto !important; }
+  .section table td { padding-inline: 0; }
+  .section pre { font-size: 12px; padding: 16px; }
+  .footer { padding: 2rem 1.25rem; }
+  .footer .content { font-size: 12px; }
+  .figure-toolbar { flex-wrap: wrap; gap: 10px; padding: 10px 12px; }
+  .figure-toolbar p { font-size: 11px; }
+  .figure-close, .figure-zoom { font-size: 12px; padding-inline: 9px; }
+  .figure-footer { padding: 10px 12px 12px; font-size: 12px; }
+  .figure-hint { font-size: 11px; }
+  .paper-extension .study-setting { padding: 12px 14px; font-size: 13px; }
+  .score-table caption { font-size: 12px; line-height: 1.6; }
+  .paper-extension .score-table { font-size: 12px; }
+  .paper-extension .score-table th, .paper-extension .score-table td { padding: 10px 4px; }
+  .paper-extension .score-table thead th { font-size: 10px; }
+  .paper-extension .score-table tbody th { font-size: 11px; }
+  .paper-extension .paper-source { font-size: 12px; }
+  .paper-extension .method-key { font-size: 12px; }
+  .finding-block .title.is-4 { font-size: 22px; }
+  .finding-block + .finding-block { margin-top: 2rem; padding-top: 1.5rem; }
+}
